@@ -1,24 +1,24 @@
 /*
-* AMRIT – Accessible Medical Records via Integrated Technology 
-* Integrated EHR (Electronic Health Records) Solution 
-*
-* Copyright (C) "Piramal Swasthya Management and Research Institute" 
-*
-* This file is part of AMRIT.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see https://www.gnu.org/licenses/.
-*/
+ * AMRIT – Accessible Medical Records via Integrated Technology
+ * Integrated EHR (Electronic Health Records) Solution
+ *
+ * Copyright (C) "Piramal Swasthya Management and Research Institute"
+ *
+ * This file is part of AMRIT.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see https://www.gnu.org/licenses/.
+ */
 package com.iemr.inventory.service.visit;
 
 import java.util.ArrayList;
@@ -47,110 +47,108 @@ import com.iemr.inventory.utils.response.OutputResponse;
 @Service
 public class VisitServiceImpl implements VisitService {
 
-	@Autowired(required=false)
-	VisitRepo visitRepo;
+    private static final String COMMON_BASE_URL = "COMMON_BASE_URL";
+    private static HttpUtils httpUtils = new HttpUtils();
+    @Autowired(required = false)
+    VisitRepo visitRepo;
+    @Autowired(required = false)
+    BeneficiaryFlowStatusRepo beneficiaryFlowStatusRepo;
+    Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    private InputMapper inputMapper = new InputMapper();
+    private String identityBaseURL = ConfigProperties.getPropertyByName("common-api-url");
 
-	@Autowired(required=false)
-	BeneficiaryFlowStatusRepo beneficiaryFlowStatusRepo;
+    @Override
+    public BeneficiaryModel getVisitDetail(String benrID, Integer providerservicemapID, String auth) throws Exception {
+        logger.info("Calling Common API : providerservicemapID" + providerservicemapID);
+        logger.info("Calling Common API : benrID" + benrID);
+        List<BeneficiaryModel> benModel = getBeneficiaryListByIDs(benrID, auth);
+        logger.info("Got result from API");
+        BeneficiaryModel beneficiaryModel = new BeneficiaryModel();
+        if (benModel.size() > 0) {
+            beneficiaryModel = benModel.get(0);
+            logger.info("Getting visit Details");
+            beneficiaryModel.setBenVisitDetail(visitRepo.findBybeneficiaryRegIDAndProviderServiceMapID(
+                    beneficiaryModel.getBeneficiaryRegID(), providerservicemapID));
+            logger.info("Getting visit flow Details");
+            beneficiaryModel.setBeneficiaryFlowStatus(beneficiaryFlowStatusRepo
+                    .findByBeneficiaryRegIDAndProviderServiceMapIdAndDoctorFlagInAndBenVisitIDNotNull(
+                            beneficiaryModel.getBeneficiaryRegID(), providerservicemapID,
+                            new Short[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}));// previously {9,2,3} as kumar said to change
+            // it for any visit medicine dispense is
+            // possible.
+        } else {
+            throw new InventoryException("Invalid Beneficiary ID");
+        }
+        return beneficiaryModel;
+    }
 
-	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-	private static HttpUtils httpUtils = new HttpUtils();
-	private InputMapper inputMapper = new InputMapper();
-	private String identityBaseURL = ConfigProperties.getPropertyByName("common-api-url");
-	private static final String COMMON_BASE_URL = "COMMON_BASE_URL";
+    public List<BeneficiaryModel> getBeneficiaryListByIDs(String benrID, String auth) throws Exception {
 
-	@Override
-	public BeneficiaryModel getVisitDetail(String benrID, Integer providerservicemapID, String auth) throws Exception {
-		logger.info("Calling Common API : providerservicemapID" + providerservicemapID);
-		logger.info("Calling Common API : benrID" + benrID);
-		List<BeneficiaryModel> benModel = getBeneficiaryListByIDs(benrID, auth);
-		logger.info("Got result from API");
-		BeneficiaryModel beneficiaryModel = new BeneficiaryModel();
-		if (benModel.size() > 0) {
-			beneficiaryModel = benModel.get(0);
-			logger.info("Getting visit Details");
-			beneficiaryModel.setBenVisitDetail(visitRepo.findBybeneficiaryRegIDAndProviderServiceMapID(
-					beneficiaryModel.getBeneficiaryRegID(), providerservicemapID));
-			logger.info("Getting visit flow Details");
-			beneficiaryModel.setBeneficiaryFlowStatus(beneficiaryFlowStatusRepo
-					.findByBeneficiaryRegIDAndProviderServiceMapIdAndDoctorFlagInAndBenVisitIDNotNull(
-							beneficiaryModel.getBeneficiaryRegID(), providerservicemapID,
-							new Short[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }));// previously {9,2,3} as kumar said to change
-																			// it for any visit medicine dispense is
-																			// possible.
-		} else {
-			throw new InventoryException("Invalid Beneficiary ID");
-		}
-		return beneficiaryModel;
-	}
+        List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<BeneficiaryModel>();
 
-	public List<BeneficiaryModel> getBeneficiaryListByIDs(String benrID, String auth) throws Exception {
+        JsonParser parser = new JsonParser();
 
-		List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<BeneficiaryModel>();
+        String result;
+        HashMap<String, Object> header = new HashMap<>();
+        if (auth != null) {
+            header.put("Authorization", auth);
+        }
 
-		JsonParser parser = new JsonParser();
+        result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchuserbyid")
+                .replace(COMMON_BASE_URL, identityBaseURL), benrID, header);
+        OutputResponse identityResponse = inputMapper.gson().fromJson(result, OutputResponse.class);
+        if (identityResponse.getStatusCode() != 200) {
+            throw new InventoryException("Invalid BeneficiaryID");
+        }
+        JsonObject responseObj = (JsonObject) parser.parse(result);
 
-		String result;
-		HashMap<String, Object> header = new HashMap<>();
-		if (auth != null) {
-			header.put("Authorization", auth);
-		}
+        JsonArray responseArray = responseObj.get("data").getAsJsonArray();
 
-		result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchuserbyid")
-				.replace(COMMON_BASE_URL, identityBaseURL), benrID, header);
-		OutputResponse identityResponse = inputMapper.gson().fromJson(result, OutputResponse.class);
-		if (identityResponse.getStatusCode() != 200) {
-			throw new InventoryException("Invalid BeneficiaryID");
-		}
-		JsonObject responseObj = (JsonObject) parser.parse(result);
+        for (JsonElement jsonElement : responseArray) {
 
-		JsonArray responseArray = responseObj.get("data").getAsJsonArray();
+            BeneficiaryModel callRequest = (BeneficiaryModel) inputMapper.gson().fromJson(jsonElement.toString(),
+                    BeneficiaryModel.class);
+            listBenDetailForOutboundDTO.add(callRequest);
 
-		for (JsonElement jsonElement : responseArray) {
+        }
+        return listBenDetailForOutboundDTO;
+    }
 
-			BeneficiaryModel callRequest = (BeneficiaryModel) inputMapper.gson().fromJson(jsonElement.toString(),
-					BeneficiaryModel.class);
-			listBenDetailForOutboundDTO.add(callRequest);
+    public List<BeneficiaryModel> getBeneficiaryListBySearch(String benrID, String auth) throws IEMRException {
 
-		}
-		return listBenDetailForOutboundDTO;
-	}
+        List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<BeneficiaryModel>();
 
-	public List<BeneficiaryModel> getBeneficiaryListBySearch(String benrID, String auth) throws IEMRException {
+        JsonParser parser = new JsonParser();
 
-		List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<BeneficiaryModel>();
+        String result;
+        HashMap<String, Object> header = new HashMap<>();
+        if (auth != null) {
+            header.put("Authorization", auth);
+        }
 
-		JsonParser parser = new JsonParser();
+        result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchBeneficiary")
+                .replace(COMMON_BASE_URL, identityBaseURL), benrID, header);
+        OutputResponse identityResponse = inputMapper.gson().fromJson(result, OutputResponse.class);
+        if (identityResponse.getStatusCode() == OutputResponse.USERID_FAILURE) {
+            throw new IEMRException(identityResponse.getErrorMessage());
+        }
+        JsonObject responseObj = (JsonObject) parser.parse(result);
 
-		String result;
-		HashMap<String, Object> header = new HashMap<>();
-		if (auth != null) {
-			header.put("Authorization", auth);
-		}
+        JsonArray responseArray = responseObj.get("data").getAsJsonArray();
 
-		result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchBeneficiary")
-				.replace(COMMON_BASE_URL, identityBaseURL), benrID, header);
-		OutputResponse identityResponse = inputMapper.gson().fromJson(result, OutputResponse.class);
-		if (identityResponse.getStatusCode() == OutputResponse.USERID_FAILURE) {
-			throw new IEMRException(identityResponse.getErrorMessage());
-		}
-		JsonObject responseObj = (JsonObject) parser.parse(result);
+        for (JsonElement jsonElement : responseArray) {
 
-		JsonArray responseArray = responseObj.get("data").getAsJsonArray();
+            BeneficiaryModel callRequest = (BeneficiaryModel) inputMapper.gson().fromJson(jsonElement.toString(),
+                    BeneficiaryModel.class);
+            listBenDetailForOutboundDTO.add(callRequest);
 
-		for (JsonElement jsonElement : responseArray) {
+        }
+        return listBenDetailForOutboundDTO;
+    }
 
-			BeneficiaryModel callRequest = (BeneficiaryModel) inputMapper.gson().fromJson(jsonElement.toString(),
-					BeneficiaryModel.class);
-			listBenDetailForOutboundDTO.add(callRequest);
+    @Override
+    public List<BeneficiaryModel> getVisitFromAdvanceSearch(String beneficiaryModel, String auth) throws IEMRException {
 
-		}
-		return listBenDetailForOutboundDTO;
-	}
-
-	@Override
-	public List<BeneficiaryModel> getVisitFromAdvanceSearch(String beneficiaryModel, String auth) throws IEMRException {
-
-		return getBeneficiaryListBySearch(beneficiaryModel, auth);
-	}
+        return getBeneficiaryListBySearch(beneficiaryModel, auth);
+    }
 }

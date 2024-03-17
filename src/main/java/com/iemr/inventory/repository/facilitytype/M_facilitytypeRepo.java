@@ -1,28 +1,27 @@
 /*
-* AMRIT – Accessible Medical Records via Integrated Technology 
-* Integrated EHR (Electronic Health Records) Solution 
-*
-* Copyright (C) "Piramal Swasthya Management and Research Institute" 
-*
-* This file is part of AMRIT.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see https://www.gnu.org/licenses/.
-*/
+ * AMRIT – Accessible Medical Records via Integrated Technology
+ * Integrated EHR (Electronic Health Records) Solution
+ *
+ * Copyright (C) "Piramal Swasthya Management and Research Institute"
+ *
+ * This file is part of AMRIT.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see https://www.gnu.org/licenses/.
+ */
 package com.iemr.inventory.repository.facilitytype;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -32,13 +31,12 @@ import org.springframework.stereotype.Repository;
 import com.iemr.inventory.data.facilitytype.M_facilitytype;
 
 @Repository
-public interface M_facilitytypeRepo extends CrudRepository<M_facilitytype, Integer>{
+public interface M_facilitytypeRepo extends CrudRepository<M_facilitytype, Integer> {
 
-	
-	
-	@Query("SELECT u FROM M_facilitytype u WHERE u.providerServiceMapID=:providerServiceMapID")
-	ArrayList<M_facilitytype> getAllFicilityData(@Param("providerServiceMapID") Integer providerServiceMapID);
 
-	M_facilitytype findByFacilityTypeID(Integer facilityTypeID);
+    @Query("SELECT u FROM M_facilitytype u WHERE u.providerServiceMapID=:providerServiceMapID")
+    ArrayList<M_facilitytype> getAllFicilityData(@Param("providerServiceMapID") Integer providerServiceMapID);
+
+    M_facilitytype findByFacilityTypeID(Integer facilityTypeID);
 
 }

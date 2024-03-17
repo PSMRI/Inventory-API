@@ -1,24 +1,24 @@
 /*
-* AMRIT – Accessible Medical Records via Integrated Technology 
-* Integrated EHR (Electronic Health Records) Solution 
-*
-* Copyright (C) "Piramal Swasthya Management and Research Institute" 
-*
-* This file is part of AMRIT.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see https://www.gnu.org/licenses/.
-*/
+ * AMRIT – Accessible Medical Records via Integrated Technology
+ * Integrated EHR (Electronic Health Records) Solution
+ *
+ * Copyright (C) "Piramal Swasthya Management and Research Institute"
+ *
+ * This file is part of AMRIT.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see https://www.gnu.org/licenses/.
+ */
 package com.iemr.inventory.service.indent;
 
 import java.util.List;
@@ -30,36 +30,25 @@ import com.iemr.inventory.data.indent.ItemfacilitymappingIndent;
 
 public interface IndentService {
 
-	List<ItemfacilitymappingIndent> findItemIndent(Integer facilityID, String itemName);
-	
-	String createIndentRequest(Indent indent);
+    List<ItemfacilitymappingIndent> findItemIndent(Integer facilityID, String itemName);
 
-	String getIndentHistory(Indent indent);
-	
-	String getOrdersByIndentID(IndentOrder indentOrder);
-	
-	String getIndentWorklist(IndentOrder indentOrder);
+    String createIndentRequest(Indent indent);
 
-	String getIndentOrderWorklist(IndentOrder indentOrder);
+    String getIndentHistory(Indent indent);
 
-	String issueIndent(IndentIssue[] array);
+    String getOrdersByIndentID(IndentOrder indentOrder);
 
-	String cancelIndentOrder(Indent indent);
+    String getIndentWorklist(IndentOrder indentOrder);
 
-	String receiveIndent(Indent indent);
+    String getIndentOrderWorklist(IndentOrder indentOrder);
 
-	String updateIndentOrder(Indent indent);
+    String issueIndent(IndentIssue[] array);
 
+    String cancelIndentOrder(Indent indent);
 
+    String receiveIndent(Indent indent);
 
+    String updateIndentOrder(Indent indent);
 
-
-
-
-	
-
-	
-
-	
 
 }

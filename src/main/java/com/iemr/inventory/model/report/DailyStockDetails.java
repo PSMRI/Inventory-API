@@ -1,73 +1,72 @@
 /*
-* AMRIT – Accessible Medical Records via Integrated Technology 
-* Integrated EHR (Electronic Health Records) Solution 
-*
-* Copyright (C) "Piramal Swasthya Management and Research Institute" 
-*
-* This file is part of AMRIT.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see https://www.gnu.org/licenses/.
-*/
+ * AMRIT – Accessible Medical Records via Integrated Technology
+ * Integrated EHR (Electronic Health Records) Solution
+ *
+ * Copyright (C) "Piramal Swasthya Management and Research Institute"
+ *
+ * This file is part of AMRIT.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see https://www.gnu.org/licenses/.
+ */
 package com.iemr.inventory.model.report;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.LongSerializationPolicy;
+import lombok.Data;
 
 import java.sql.Date;
 import java.sql.Timestamp;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.LongSerializationPolicy;
-
-import lombok.Data;
-
 @Data
 public class DailyStockDetails {
 
-	private Long slNo;
+    private Long slNo;
 
-	private Timestamp date;
+    private Timestamp date;
 
-	private String facilityName;
+    private String facilityName;
 
-	private String itemName;
+    private String itemName;
 
-	private String itemCategory;
+    private String itemCategory;
 
-	private String batchNo;
+    private String batchNo;
 
-	private Double unitCostPrice;
+    private Double unitCostPrice;
 
-	private Date expiryDate;
+    private Date expiryDate;
 
-	private Long quantityReceived;
+    private Long quantityReceived;
 
-	private Long openingStock;
+    private Long openingStock;
 
-	private Long dispensedQuantity;
+    private Long dispensedQuantity;
 
-	private Long adjustmentReceipt;
+    private Long adjustmentReceipt;
 
-	private Long adjustmentIssue;
+    private Long adjustmentIssue;
 
-	private Long closingStock;
+    private Long closingStock;
 
-	private Timestamp itemEnteredDate;
+    private Timestamp itemEnteredDate;
 
 
-	@Override
-	public String toString() {
+    @Override
+    public String toString() {
 
-		return new GsonBuilder().setLongSerializationPolicy(LongSerializationPolicy.STRING).serializeNulls()
-				.setDateFormat("dd-MM-yyyy").create().toJson(this);
+        return new GsonBuilder().setLongSerializationPolicy(LongSerializationPolicy.STRING).serializeNulls()
+                .setDateFormat("dd-MM-yyyy").create().toJson(this);
 
-	}
+    }
 }

@@ -1,170 +1,157 @@
 /*
-* AMRIT – Accessible Medical Records via Integrated Technology 
-* Integrated EHR (Electronic Health Records) Solution 
-*
-* Copyright (C) "Piramal Swasthya Management and Research Institute" 
-*
-* This file is part of AMRIT.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see https://www.gnu.org/licenses/.
-*/
+ * AMRIT – Accessible Medical Records via Integrated Technology
+ * Integrated EHR (Electronic Health Records) Solution
+ *
+ * Copyright (C) "Piramal Swasthya Management and Research Institute"
+ *
+ * This file is part of AMRIT.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see https://www.gnu.org/licenses/.
+ */
 package com.iemr.inventory.data.locationmaster;
-
-import java.sql.Timestamp;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 import com.google.gson.annotations.Expose;
 import com.iemr.inventory.utils.mapper.OutputMapper;
+import jakarta.persistence.*;
+
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "m_districtblock")
 public class DistrictBlock {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "BlockID")
-	@Expose
-	private Integer blockID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "BlockID")
+    @Expose
+    private Integer blockID;
 
-	@Column(name = "DistrictID")
-	@Expose
-	private Integer districtID;
-	@Expose
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(updatable = false, insertable = false, name = "districtID")
-	private M_District district;
-	
-	@Column(name = "BlockName")
-	@Expose
-	private String blockName;
-	@Column(name = "StateID")
-	@Expose
-	private Integer stateID;
-	@Expose
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(updatable = false, insertable = false, name = "stateID")
-	private State state;
-	
-	@Column(name = "Deleted", insertable = false, updatable = true)
-	@Expose
-	private Boolean deleted;
-	@Column(name = "CreatedBy")
-	@Expose
-	private String createdBy;
-	@Column(name = "CreatedDate", insertable = false, updatable = false)
-	private Timestamp createdDate;
-	@Column(name = "ModifiedBy")
-	private String modifiedBy;
-	@Column(name = "LastModDate", insertable = false, updatable = false)
-	private Timestamp lastModDate;
+    @Column(name = "DistrictID")
+    @Expose
+    private Integer districtID;
+    @Expose
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(updatable = false, insertable = false, name = "districtID")
+    private M_District district;
 
-	
+    @Column(name = "BlockName")
+    @Expose
+    private String blockName;
+    @Column(name = "StateID")
+    @Expose
+    private Integer stateID;
+    @Expose
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(updatable = false, insertable = false, name = "stateID")
+    private State state;
 
-	public DistrictBlock() {
-	}
+    @Column(name = "Deleted", insertable = false, updatable = true)
+    @Expose
+    private Boolean deleted;
+    @Column(name = "CreatedBy")
+    @Expose
+    private String createdBy;
+    @Column(name = "CreatedDate", insertable = false, updatable = false)
+    private Timestamp createdDate;
+    @Column(name = "ModifiedBy")
+    private String modifiedBy;
+    @Column(name = "LastModDate", insertable = false, updatable = false)
+    private Timestamp lastModDate;
+    @Transient
+    private OutputMapper outputMapper = new OutputMapper();
 
-	public DistrictBlock(Integer BlockID, String BlockName) {
-		this.blockID = BlockID;
-		this.blockName = BlockName;
-	}
+    public DistrictBlock() {
+    }
 
-	public Integer getBlockID() {
-		return this.blockID;
-	}
+    public DistrictBlock(Integer BlockID, String BlockName) {
+        this.blockID = BlockID;
+        this.blockName = BlockName;
+    }
 
-	public void setBlockID(Integer blockID) {
-		this.blockID = blockID;
-	}
+    public Integer getBlockID() {
+        return this.blockID;
+    }
 
-	public Integer getDistrictID() {
-		return this.districtID;
-	}
+    public void setBlockID(Integer blockID) {
+        this.blockID = blockID;
+    }
 
-	public void setDistrictID(Integer districtID) {
-		this.districtID = districtID;
-	}
+    public Integer getDistrictID() {
+        return this.districtID;
+    }
 
-	public String getBlockName() {
-		return this.blockName;
-	}
+    public void setDistrictID(Integer districtID) {
+        this.districtID = districtID;
+    }
 
-	public void setBlockName(String blockName) {
-		this.blockName = blockName;
-	}
+    public String getBlockName() {
+        return this.blockName;
+    }
 
-	public Integer getStateID() {
-		return this.stateID;
-	}
+    public void setBlockName(String blockName) {
+        this.blockName = blockName;
+    }
 
-	public void setStateID(Integer stateID) {
-		this.stateID = stateID;
-	}
+    public Integer getStateID() {
+        return this.stateID;
+    }
 
-	public Boolean isDeleted() {
-		return this.deleted;
-	}
+    public void setStateID(Integer stateID) {
+        this.stateID = stateID;
+    }
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
+    public Boolean isDeleted() {
+        return this.deleted;
+    }
 
-	public String getCreatedBy() {
-		return this.createdBy;
-	}
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
+    public String getCreatedBy() {
+        return this.createdBy;
+    }
 
-	public Timestamp getCreatedDate() {
-		return this.createdDate;
-	}
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-	public void setCreatedDate(Timestamp createdDate) {
-		this.createdDate = createdDate;
-	}
+    public Timestamp getCreatedDate() {
+        return this.createdDate;
+    }
 
-	public String getModifiedBy() {
-		return this.modifiedBy;
-	}
+    public void setCreatedDate(Timestamp createdDate) {
+        this.createdDate = createdDate;
+    }
 
-	public void setModifiedBy(String modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
+    public String getModifiedBy() {
+        return this.modifiedBy;
+    }
 
-	public Timestamp getLastModDate() {
-		return this.lastModDate;
-	}
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
 
-	public void setLastModDate(Timestamp lastModDate) {
-		this.lastModDate = lastModDate;
-	}
+    public Timestamp getLastModDate() {
+        return this.lastModDate;
+    }
 
-	@Transient
-	private OutputMapper outputMapper = new OutputMapper();
+    public void setLastModDate(Timestamp lastModDate) {
+        this.lastModDate = lastModDate;
+    }
 
-	@Override
-	public String toString() {
-		return outputMapper.gson().toJson(this);
-	}
+    @Override
+    public String toString() {
+        return outputMapper.gson().toJson(this);
+    }
 }

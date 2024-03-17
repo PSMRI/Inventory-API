@@ -1,8 +1,8 @@
 /*
- * AMRIT – Accessible Medical Records via Integrated Technology 
- * Integrated EHR (Electronic Health Records) Solution 
+ * AMRIT – Accessible Medical Records via Integrated Technology
+ * Integrated EHR (Electronic Health Records) Solution
  *
- * Copyright (C) "Piramal Swasthya Management and Research Institute" 
+ * Copyright (C) "Piramal Swasthya Management and Research Institute"
  *
  * This file is part of AMRIT.
  *
@@ -41,8 +41,15 @@ import org.springframework.stereotype.Component;
 public class ConfigProperties {
     private static Properties properties;
     private static Logger logger = LoggerFactory.getLogger(ConfigProperties.class);
-
+    @Value("${iemr.extend.expiry.time:false}")
+    private static Boolean extendExpiryTime;
+    @Value("${iemr.session.expiry.time:100}")
+    private static Integer sessionExpiryTime;
     private Environment environment;
+    @Value("${iemr.redis.url:localhost}")
+    private String redisurl;
+    @Value("${iemr.redis.port:0000}")
+    private Integer redisport;
 
     public ConfigProperties() {
         initializeProperties();
@@ -58,37 +65,6 @@ public class ConfigProperties {
                 logger.error("Loading of config file failed with error " + e.getLocalizedMessage(), e);
             }
         }
-    }
-
-    @Autowired
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
-    }
-
-    @Value("${iemr.extend.expiry.time:false}")
-    private static Boolean extendExpiryTime;
-
-    @Value("${iemr.session.expiry.time:100}")
-    private static Integer sessionExpiryTime;
-
-    @Value("${iemr.redis.url:localhost}")
-    private String redisurl;
-
-    @Value("${iemr.redis.port:0000}")
-    private Integer redisport;
-
-    public String getRedisUrl() {
-        if (redisurl == null) {
-            redisurl = getPropertyByName("iemr.redis.url");
-        }
-        return redisurl;
-    }
-
-    public int getRedisPort() {
-        if (redisport == null) {
-            redisport = getInteger("iemr.redis.port");
-        }
-        return redisport;
     }
 
     public static boolean getExtendExpiryTime() {
@@ -136,6 +112,25 @@ public class ConfigProperties {
             logger.error(propertyName + " retrieval failed.", e);
         }
         return result;
+    }
+
+    @Autowired
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
+
+    public String getRedisUrl() {
+        if (redisurl == null) {
+            redisurl = getPropertyByName("iemr.redis.url");
+        }
+        return redisurl;
+    }
+
+    public int getRedisPort() {
+        if (redisport == null) {
+            redisport = getInteger("iemr.redis.port");
+        }
+        return redisport;
     }
 
     public Long getLong(String propertyName) {

@@ -1,270 +1,256 @@
 /*
-* AMRIT – Accessible Medical Records via Integrated Technology 
-* Integrated EHR (Electronic Health Records) Solution 
-*
-* Copyright (C) "Piramal Swasthya Management and Research Institute" 
-*
-* This file is part of AMRIT.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see https://www.gnu.org/licenses/.
-*/
+ * AMRIT – Accessible Medical Records via Integrated Technology
+ * Integrated EHR (Electronic Health Records) Solution
+ *
+ * Copyright (C) "Piramal Swasthya Management and Research Institute"
+ *
+ * This file is part of AMRIT.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see https://www.gnu.org/licenses/.
+ */
 package com.iemr.inventory.data.store;
-
-import java.sql.Date;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 import com.google.gson.annotations.Expose;
 import com.iemr.inventory.utils.mapper.OutputMapper;
-
+import jakarta.persistence.*;
 import lombok.Data;
 
+import java.sql.Date;
+
 @Entity
-@Table(name="m_facility")
+@Table(name = "m_facility")
 @Data
 public class M_Facility {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Expose
-	@Column(name="FacilityID")
-	private Integer facilityID;
-	@Expose
-	@Column(name="FacilityName")
-	private String facilityName;
-	@Expose
-	@Column(name="FacilityDesc")
-	private String facilityDesc;
-	@Expose
-	@Column(name="FacilityCode")
-	private String facilityCode;
-	@Expose
-	@Column(name="FacilityTypeID")
-	private Integer facilityTypeID;
-	@Expose
-	@Column(name="Location")
-	private String location;
-	@Expose
-	@Column(name="PhysicalLocation")
-	private String physicalLocation;
-	@Expose
-	@Column(name="StoreType")
-	private String storeType;
-	@Expose
-	@Column(name="Status")
-	private String status;
-	@Expose
-	@Column(name="IsMainFacility",insertable = true, updatable = false)
-	private Boolean isMainFacility;
-	@Expose
-	@Column(name="MainFacilityID")
-	private Integer mainFacilityID;
-	@Expose
-	@Column(name="ProviderServiceMapID")
-	private Integer providerServiceMapID;
-//	@Expose
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Expose
+    @Column(name = "FacilityID")
+    private Integer facilityID;
+    @Expose
+    @Column(name = "FacilityName")
+    private String facilityName;
+    @Expose
+    @Column(name = "FacilityDesc")
+    private String facilityDesc;
+    @Expose
+    @Column(name = "FacilityCode")
+    private String facilityCode;
+    @Expose
+    @Column(name = "FacilityTypeID")
+    private Integer facilityTypeID;
+    @Expose
+    @Column(name = "Location")
+    private String location;
+    @Expose
+    @Column(name = "PhysicalLocation")
+    private String physicalLocation;
+    @Expose
+    @Column(name = "StoreType")
+    private String storeType;
+    @Expose
+    @Column(name = "Status")
+    private String status;
+    @Expose
+    @Column(name = "IsMainFacility", insertable = true, updatable = false)
+    private Boolean isMainFacility;
+    @Expose
+    @Column(name = "MainFacilityID")
+    private Integer mainFacilityID;
+    @Expose
+    @Column(name = "ProviderServiceMapID")
+    private Integer providerServiceMapID;
+    //	@Expose
 //	@Column(name="StoreType")
 //	private String mapType;
 //	@Expose
 //	@Column(name="StoreType")
 //	private String mapID;
-	@Expose
-	@Column(name="Deleted",insertable = false, updatable = true)
-	private Boolean deleted; 
-	
-	@Expose
-	@Column(name="Processed",insertable = false, updatable = true)
-	private Character processed; 
-	
-	@Expose
-	@Column(name="CreatedBy")
-	private String createdBy; 
-	
-	@Expose
-	@Column(name="CreatedDate",insertable = false, updatable = false)
-	private Date createdDate;
-	
-	@Expose
-	@Column(name="ModifiedBy")
-	private String modifiedBy;
-	
-	@Expose
-	@Column(name="LastModDate",insertable = false, updatable = false)
-	private Date lastModDate;
-	
-	
-	
-	
-	
-	
-	public Integer getFacilityID() {
-		return facilityID;
-	}
+    @Expose
+    @Column(name = "Deleted", insertable = false, updatable = true)
+    private Boolean deleted;
 
-	public void setFacilityID(Integer facilityID) {
-		this.facilityID = facilityID;
-	}
+    @Expose
+    @Column(name = "Processed", insertable = false, updatable = true)
+    private Character processed;
 
-	public String getFacilityName() {
-		return facilityName;
-	}
+    @Expose
+    @Column(name = "CreatedBy")
+    private String createdBy;
 
-	public void setFacilityName(String facilityName) {
-		this.facilityName = facilityName;
-	}
+    @Expose
+    @Column(name = "CreatedDate", insertable = false, updatable = false)
+    private Date createdDate;
 
-	public String getFacilityDesc() {
-		return facilityDesc;
-	}
+    @Expose
+    @Column(name = "ModifiedBy")
+    private String modifiedBy;
 
-	public void setFacilityDesc(String facilityDesc) {
-		this.facilityDesc = facilityDesc;
-	}
+    @Expose
+    @Column(name = "LastModDate", insertable = false, updatable = false)
+    private Date lastModDate;
+    @Transient
+    private OutputMapper outputMapper = new OutputMapper();
 
-	public String getFacilityCode() {
-		return facilityCode;
-	}
+    public Integer getFacilityID() {
+        return facilityID;
+    }
 
-	public void setFacilityCode(String facilityCode) {
-		this.facilityCode = facilityCode;
-	}
+    public void setFacilityID(Integer facilityID) {
+        this.facilityID = facilityID;
+    }
 
-	public Integer getFacilityTypeID() {
-		return facilityTypeID;
-	}
+    public String getFacilityName() {
+        return facilityName;
+    }
 
-	public void setFacilityTypeID(Integer facilityTypeID) {
-		this.facilityTypeID = facilityTypeID;
-	}
+    public void setFacilityName(String facilityName) {
+        this.facilityName = facilityName;
+    }
 
-	public String getLocation() {
-		return location;
-	}
+    public String getFacilityDesc() {
+        return facilityDesc;
+    }
 
-	public void setLocation(String location) {
-		this.location = location;
-	}
+    public void setFacilityDesc(String facilityDesc) {
+        this.facilityDesc = facilityDesc;
+    }
 
-	public String getPhysicalLocation() {
-		return physicalLocation;
-	}
+    public String getFacilityCode() {
+        return facilityCode;
+    }
 
-	public void setPhysicalLocation(String physicalLocation) {
-		this.physicalLocation = physicalLocation;
-	}
+    public void setFacilityCode(String facilityCode) {
+        this.facilityCode = facilityCode;
+    }
 
-	public String getStoreType() {
-		return storeType;
-	}
+    public Integer getFacilityTypeID() {
+        return facilityTypeID;
+    }
 
-	public void setStoreType(String storeType) {
-		this.storeType = storeType;
-	}
+    public void setFacilityTypeID(Integer facilityTypeID) {
+        this.facilityTypeID = facilityTypeID;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public String getLocation() {
+        return location;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-	public Boolean getIsMainFacility() {
-		return isMainFacility;
-	}
+    public String getPhysicalLocation() {
+        return physicalLocation;
+    }
 
-	public void setIsMainFacility(Boolean isMainFacility) {
-		this.isMainFacility = isMainFacility;
-	}
+    public void setPhysicalLocation(String physicalLocation) {
+        this.physicalLocation = physicalLocation;
+    }
 
-	public Integer getMainFacilityID() {
-		return mainFacilityID;
-	}
+    public String getStoreType() {
+        return storeType;
+    }
 
-	public void setMainFacilityID(Integer mainFacilityID) {
-		this.mainFacilityID = mainFacilityID;
-	}
+    public void setStoreType(String storeType) {
+        this.storeType = storeType;
+    }
 
-	public Integer getProviderServiceMapID() {
-		return providerServiceMapID;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public void setProviderServiceMapID(Integer providerServiceMapID) {
-		this.providerServiceMapID = providerServiceMapID;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public Boolean getDeleted() {
-		return deleted;
-	}
+    public Boolean getIsMainFacility() {
+        return isMainFacility;
+    }
 
-	public void setDeleted(Boolean deleted) {
-		this.deleted = deleted;
-	}
+    public void setIsMainFacility(Boolean isMainFacility) {
+        this.isMainFacility = isMainFacility;
+    }
 
-	public Character getProcessed() {
-		return processed;
-	}
+    public Integer getMainFacilityID() {
+        return mainFacilityID;
+    }
 
-	public void setProcessed(Character processed) {
-		this.processed = processed;
-	}
+    public void setMainFacilityID(Integer mainFacilityID) {
+        this.mainFacilityID = mainFacilityID;
+    }
 
-	public String getCreatedBy() {
-		return createdBy;
-	}
+    public Integer getProviderServiceMapID() {
+        return providerServiceMapID;
+    }
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
+    public void setProviderServiceMapID(Integer providerServiceMapID) {
+        this.providerServiceMapID = providerServiceMapID;
+    }
 
-	public Date getCreatedDate() {
-		return createdDate;
-	}
+    public Boolean getDeleted() {
+        return deleted;
+    }
 
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
 
-	public String getModifiedBy() {
-		return modifiedBy;
-	}
+    public Character getProcessed() {
+        return processed;
+    }
 
-	public void setModifiedBy(String modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
+    public void setProcessed(Character processed) {
+        this.processed = processed;
+    }
 
-	public Date getLastModDate() {
-		return lastModDate;
-	}
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-	public void setLastModDate(Date lastModDate) {
-		this.lastModDate = lastModDate;
-	}
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-	@Transient
-	private OutputMapper outputMapper = new OutputMapper();
+    public Date getCreatedDate() {
+        return createdDate;
+    }
 
-	@Override
-	public String toString() {
-		return outputMapper.gson().toJson(this);
-	}
-	
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    public Date getLastModDate() {
+        return lastModDate;
+    }
+
+    public void setLastModDate(Date lastModDate) {
+        this.lastModDate = lastModDate;
+    }
+
+    @Override
+    public String toString() {
+        return outputMapper.gson().toJson(this);
+    }
+
 
 }

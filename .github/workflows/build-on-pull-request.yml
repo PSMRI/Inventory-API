@@ -2,12 +2,12 @@ name: Build On Pull Request
 on:
   pull_request:
     branches: [ "feature/version/upgrade" ]
-    
+
 jobs:
   Build:
     runs-on: ubuntu-latest
     steps:
-    
+
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -19,5 +19,5 @@ jobs:
         with:
           java-version: 17
           distribution: 'adopt'
-      - name: Build with Maven  
+      - name: Build with Maven
         run: mvn clean install
