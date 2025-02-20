@@ -30,8 +30,12 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.iemr.inventory.data.user.M_User;
 import com.iemr.inventory.utils.IEMRApplBeans;
 import com.iemr.inventory.utils.config.ConfigProperties;
 
@@ -40,7 +44,7 @@ import com.iemr.inventory.utils.config.ConfigProperties;
 @ComponentScan
 @SpringBootApplication
 @EnableCaching(proxyTargetClass = true)
-public class RoleMasterApplication extends SpringBootServletInitializer{
+public class RoleMasterApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(roleMasterApplication, args);
@@ -61,6 +65,20 @@ public class RoleMasterApplication extends SpringBootServletInitializer{
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
 		return builder.sources(new Class[] { RoleMasterApplication.class });
 	}
-	
-	
+
+	@Bean
+	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+		RedisTemplate<String, Object> template = new RedisTemplate<>();
+		template.setConnectionFactory(factory);
+
+		// Use StringRedisSerializer for keys (userId)
+		template.setKeySerializer(new StringRedisSerializer());
+
+		// Use Jackson2JsonRedisSerializer for values (Users objects)
+		Jackson2JsonRedisSerializer<M_User> serializer = new Jackson2JsonRedisSerializer<>(M_User.class);
+		template.setValueSerializer(serializer);
+
+		return template;
+	}
+
 }

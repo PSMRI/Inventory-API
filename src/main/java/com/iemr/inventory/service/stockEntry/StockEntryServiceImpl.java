@@ -204,10 +204,7 @@ public class StockEntryServiceImpl implements StockEntryService {
 					break;
 				} 
 			}
-			if (totalQty < itemStockExit.getQuantity()) {
-				throw new InventoryException(
-						"Insufficent Qty for '" + item.getItemName() + "'. Available Qty is : " + totalQty);
-			}
+			
 			List<ItemBatchList> stockBatch = itemBatchListMap.getItemStockExitMapList(itemStockList);
 			for (ItemBatchList objList : stockBatch) {
 				if (objList.getExpiryDate() != null)
