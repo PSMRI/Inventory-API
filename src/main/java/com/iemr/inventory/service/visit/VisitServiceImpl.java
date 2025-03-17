@@ -29,6 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -37,6 +41,7 @@ import com.google.gson.JsonParser;
 import com.iemr.inventory.data.visit.BeneficiaryModel;
 import com.iemr.inventory.repo.visit.BeneficiaryFlowStatusRepo;
 import com.iemr.inventory.repo.visit.VisitRepo;
+import com.iemr.inventory.utils.CookieUtil;
 import com.iemr.inventory.utils.config.ConfigProperties;
 import com.iemr.inventory.utils.exception.IEMRException;
 import com.iemr.inventory.utils.exception.InventoryException;
@@ -44,14 +49,18 @@ import com.iemr.inventory.utils.http.HttpUtils;
 import com.iemr.inventory.utils.mapper.InputMapper;
 import com.iemr.inventory.utils.response.OutputResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Service
 public class VisitServiceImpl implements VisitService {
 
-	@Autowired(required=false)
+	@Autowired(required = false)
 	VisitRepo visitRepo;
 
-	@Autowired(required=false)
+	@Autowired(required = false)
 	BeneficiaryFlowStatusRepo beneficiaryFlowStatusRepo;
+	@Autowired
+	private CookieUtil cookieUtil;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	private static HttpUtils httpUtils = new HttpUtils();
@@ -95,6 +104,10 @@ public class VisitServiceImpl implements VisitService {
 		if (auth != null) {
 			header.put("Authorization", auth);
 		}
+		HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+		String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
+		header.put("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
 		result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchuserbyid")
 				.replace(COMMON_BASE_URL, identityBaseURL), benrID, header);
@@ -127,6 +140,10 @@ public class VisitServiceImpl implements VisitService {
 		if (auth != null) {
 			header.put("Authorization", auth);
 		}
+		HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+		String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
+		header.put("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
 		result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchBeneficiary")
 				.replace(COMMON_BASE_URL, identityBaseURL), benrID, header);
