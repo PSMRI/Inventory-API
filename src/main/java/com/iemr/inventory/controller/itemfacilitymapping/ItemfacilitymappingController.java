@@ -56,7 +56,7 @@ public class ItemfacilitymappingController {
 	@Autowired
 	private M_itemfacilitymappingInter M_itemfacilitymappingInter;
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Map item to store", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/mapItemtoStrore", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -111,7 +111,7 @@ public class ItemfacilitymappingController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Edit item to store", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/editItemtoStrore", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -144,7 +144,7 @@ public class ItemfacilitymappingController {
 
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Delete item to store", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/deleteItemtoStrore", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -173,7 +173,7 @@ public class ItemfacilitymappingController {
 
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get sub store item", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getSubStoreitem", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -199,7 +199,7 @@ public class ItemfacilitymappingController {
 
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get all facility mapped data", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getAllFacilityMappedData", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -225,7 +225,7 @@ public class ItemfacilitymappingController {
 
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get item from store id", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getItemFromStoreID/{storeID}", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -247,7 +247,7 @@ public class ItemfacilitymappingController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Item partial search", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/itemPartialSearch", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -270,7 +270,7 @@ public class ItemfacilitymappingController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get item batch for store transfer", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getItemBatchForStoreTransfer", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })

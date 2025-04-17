@@ -48,7 +48,7 @@ public class ManufacturerController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Create manufacturer", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/createManufacturer", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -73,7 +73,7 @@ public class ManufacturerController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get manufacturer", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getManufacturer", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -99,7 +99,7 @@ public class ManufacturerController {
 
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Edit manufacturer", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/editManufacturer", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -134,7 +134,7 @@ public class ManufacturerController {
 
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Delete manufacturer", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/deleteManufacturer", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })

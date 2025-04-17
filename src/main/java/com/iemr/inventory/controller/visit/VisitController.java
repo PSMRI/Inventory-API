@@ -51,7 +51,7 @@ public class VisitController {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get visit details from beneficary id", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getVisitFromBenID", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -78,7 +78,7 @@ public class VisitController {
 
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get visit details from advance search", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getVisitFromAdvanceSearch", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
