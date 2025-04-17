@@ -49,7 +49,7 @@ public class UnitOfMeasurementController {
 	@Autowired
 	private UomInter uomInter;
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Create unit of measurement", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/createUom", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -74,7 +74,7 @@ public class UnitOfMeasurementController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get unit of measurement", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getUom", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -99,7 +99,7 @@ public class UnitOfMeasurementController {
 
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Edit unit of measurement", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/editUom", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -131,7 +131,7 @@ public class UnitOfMeasurementController {
 
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Delete unit of measurement", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/deleteUom", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })

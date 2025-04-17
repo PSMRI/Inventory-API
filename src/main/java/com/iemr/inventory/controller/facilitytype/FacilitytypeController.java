@@ -49,7 +49,7 @@ public class FacilitytypeController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get facility", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getFacility", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -74,7 +74,7 @@ public class FacilitytypeController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Add facility", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/addFacility", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -99,7 +99,7 @@ public class FacilitytypeController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Edit facility", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/editFacility", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -131,7 +131,7 @@ public class FacilitytypeController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Delete facility", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/deleteFacility", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })

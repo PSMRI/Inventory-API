@@ -42,7 +42,7 @@ public class VersionController {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get version details", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/version", method = { RequestMethod.GET })
 	public String versionInformation() {

@@ -49,7 +49,7 @@ public class PharmacologicalCategoryController {
 	@Autowired
 	private PharmacologicalcategoryInter pharmacologicalcategoryInter;
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Create pharmacological category", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/createPharmacologicalcategory", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -76,7 +76,7 @@ public class PharmacologicalCategoryController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Get pharmacological category", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getPharmacologicalcategory", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -102,7 +102,7 @@ public class PharmacologicalCategoryController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Edit pharmacological category", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/editPharmacologicalcategory", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -133,7 +133,7 @@ public class PharmacologicalCategoryController {
 
 	}
 
-	@CrossOrigin()
+	
 	@ApiOperation(value = "Delete pharmacological category", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/deletePharmacologicalcategory", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
