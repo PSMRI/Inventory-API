@@ -1,3 +1,5 @@
-import { DiffieHellmanGroup } from "crypto";
+import { DiffieHellmanGroup, KeyObject } from "crypto";
 
 DiffieHellmanGroup
+KeyObject
+console.log("Hello")
