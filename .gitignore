@@ -1,6 +1,9 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
 
+# dependencies
+/node_modules
+
 ### STS ###
 .apt_generated
 .classpath
@@ -8,7 +11,6 @@ target/
 .project
 .settings
 .springBeans
-node_modules/
 
 ### IntelliJ IDEA ###
 .idea
@@ -28,6 +30,7 @@ nbdist/
 config.service.ts
 config.json
 ./bin
+package-lock.json
 
 # Additional files to ignore
 mvnw.cmd
