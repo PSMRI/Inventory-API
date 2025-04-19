@@ -28,16 +28,6 @@ To install the inventory module, follow these steps:
 1. Clone the repository to your local machine.
 2. Install the dependencies `mvn clean install`
 
-## Setting Up Commit Hooks
-
-This project uses Git hooks to enforce consistent code quality and commit message standards. Even though this is a Java project, the hooks are powered by Node.js. Follow these steps to set up the hooks locally:
-
-### Prerequisites
-
-- Node.js (v14 or later)
-- npm (comes with Node.js)
-
-
 ### Creating a build configuration and running the application
 
 1. You can copy `common_example.properties` to `common_local.properties` and edit the file accordingly. The file is under `src/main/environment` folder.
