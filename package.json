@@ -4,12 +4,7 @@
   "description": "[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)  ![branch parameter](https://github.com/PSMRI/Inventory-API/actions/workflows/sast-and-package.yml/badge.svg)",
   "scripts": {
     "prepare": "husky",
-    "commit": "cz",
-    "config": {
-      "commitizen": {
-        "path": "./node_modules/cz-conventional-changelog"
-      }
-    }
+    "commit": "cz"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
@@ -18,5 +13,10 @@
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.7"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

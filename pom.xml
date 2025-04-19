@@ -273,24 +273,6 @@
 		<finalName>Inventoryapi-v3.0.0</finalName>
 		<plugins>
 			<plugin>
-				<groupId>com.diffplug.spotless</groupId>
-				<artifactId>spotless-maven-plugin</artifactId>
-				<version>2.44.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-							<goal>apply</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<java>
-						<googleJavaFormat/>
-					</java>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
 				<version>10.0.3</version>
