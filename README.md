@@ -56,23 +56,32 @@ This project uses Git hooks to enforce consistent code quality and commit messag
      node --version
      npm --version
      ```
+
 2. **Install dependencies**
    - From the project root directory, run:
      ```
      npm ci
      ```
-   - This will install all required dependencies including Husky and commitlint
-3. **Verify hooks installation**
-   - The hooks should be automatically installed by Husky
-   - You can verify by checking if the `.husky` directory contains executable hooks
+   - This will install all required dependencies including Husky, Commitlint, and Commitizen.
 
+3. **Verify hooks installation**
+   - The hooks should be automatically installed by Husky.
+   - You can verify by checking if the `.husky` directory contains executable hooks.
+
+4. **Set up Commitizen for guided commits**:
+   - Once dependencies are installed, you can use Commitizen to ensure your commit messages follow the conventional format. Instead of using `git commit`, use the following command:
+     ```
+     npm run commit
+     ```
+     This command will guide you through a series of prompts to format your commit message according to the project's commit convention.
 ### Commit Message Convention
 
-This project follows a specific commit message format:
+This project follows a specific commit message format to ensure a clean and consistent commit history:
 
-- Format: `type(scope): subject`
-- Example: `feat(login): add remember me functionality`
-  Types include:
+- **Format**: `type(scope): subject`
+- **Example**: `feat(login): add remember me functionality`
+
+Types include:
 - `feat`: A new feature
 - `fix`: A bug fix
 - `docs`: Documentation changes
@@ -83,7 +92,8 @@ This project follows a specific commit message format:
 - `build`: Changes to build process or tools
 - `ci`: Changes to CI configuration
 - `chore`: Other changes (e.g., maintenance tasks, dependencies)
-  Your commit messages will be automatically validated when you commit, ensuring project consistency.
+
+Commit messages will be automatically validated using Commitlint when you commit, ensuring that all commits follow the same convention.
 
 ### Usage
 
