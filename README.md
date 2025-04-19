@@ -1,24 +1,28 @@
 # AMRIT - Inventory API
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)  ![branch parameter](https://github.com/PSMRI/Inventory-API/actions/workflows/sast-and-package.yml/badge.svg)
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) ![branch parameter](https://github.com/PSMRI/Inventory-API/actions/workflows/sast-and-package.yml/badge.svg)
 
 Inventory service acts as a medicine inventory management and dispensing unit that helps in distributing the medicine to the pateint as per the prescription. Exposes below set of features as REST APIs.
 
-* Item tracking
-* Purchase order management
-* Inventory reports
-* Create, read, update, and delete inventory items.
-* Get inventory levels.
+- Item tracking
+- Purchase order management
+- Inventory reports
+- Create, read, update, and delete inventory items.
+- Get inventory levels.
 
 ## Building From Source
+
 This microservice is built on Java, Spring boot framework and MySQL DB.
 
 ### Prerequisites
-* JDK 1.8
-* Wildfly 11
-* MySQL
-* Springboot V2
+
+- JDK 1.8
+- Wildfly 11
+- MySQL
+- Springboot V2
 
 ## Installation
+
 To install the inventory module, follow these steps:
 
 1. Clone the repository to your local machine.
@@ -31,16 +35,67 @@ To install the inventory module, follow these steps:
 
 Open the application in your browser. The inventory module will be accessible at http://localhost:3000/inventory.
 
+### Setting Up Commit Hooks
+
+This project uses Git hooks to enforce consistent code quality and commit message standards. Even though this is a Java project, the hooks are powered by Node.js. Follow these steps to set up the hooks locally:
+
+1. **Install Node.js and npm**
+   - Download and install from [nodejs.org](https://nodejs.org/)
+   - Verify installation with:
+     ```
+     node --version
+     npm --version
+     ```
+
+2. **Install dependencies**
+   - From the project root directory, run:
+     ```
+     npm ci
+     ```
+   - This will install all required dependencies including Husky, Commitlint, and Commitizen.
+
+3. **Verify hooks installation**
+   - The hooks should be automatically installed by Husky.
+   - You can verify by checking if the `.husky` directory contains executable hooks.
+
+4. **Set up Commitizen for guided commits**:
+   - Once dependencies are installed, you can use Commitizen to ensure your commit messages follow the conventional format. Instead of using `git commit`, use the following command:
+     ```
+     npm run commit
+     ```
+     This command will guide you through a series of prompts to format your commit message according to the project's commit convention.
+### Commit Message Convention
+
+This project follows a specific commit message format to ensure a clean and consistent commit history:
+
+- **Format**: `type(scope): subject`
+- **Example**: `feat(login): add remember me functionality`
+
+Types include:
+- `feat`: A new feature
+- `fix`: A bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code changes that neither fix bugs nor add features
+- `perf`: Performance improvements
+- `test`: Adding or fixing tests
+- `build`: Changes to build process or tools
+- `ci`: Changes to CI configuration
+- `chore`: Other changes (e.g., maintenance tasks, dependencies)
+
+Commit messages will be automatically validated using Commitlint when you commit, ensuring that all commits follow the same convention.
+
 ### Usage
+
 Inventory module can be used to track items, create purchase orders, generate inventory reports, and scan barcodes. To access the inventory module, navigate to http://localhost:3000/inventory in your browser. You will be able to view all of the items in your inventory, create purchase orders and generate inventory reports.
 
 All other features have been exposed as REST endpoints. Refer to the SWAGGER API specification for details.
 
 ## Filing Issues
 
-If you encounter any issues, bugs, or have feature requests, please file them in the [main AMRIT repository](https://github.com/PSMRI/AMRIT/issues). Centralizing all feedback helps us streamline improvements and address concerns efficiently.  
+If you encounter any issues, bugs, or have feature requests, please file them in the [main AMRIT repository](https://github.com/PSMRI/AMRIT/issues). Centralizing all feedback helps us streamline improvements and address concerns efficiently.
 
 ## Join Our Community
 
-We’d love to have you join our community discussions and get real-time support!  
-Join our [Discord server](https://discord.gg/FVQWsf5ENS) to connect with contributors, ask questions, and stay updated.  
+We'd love to have you join our community discussions and get real-time support!  
+Join our [Discord server](https://discord.gg/FVQWsf5ENS) to connect with contributors, ask questions, and stay updated.
