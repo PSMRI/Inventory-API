@@ -11,7 +11,7 @@ Inventory service acts as a medicine inventory management and dispensing unit th
 
 ## Building From Source
 This microservice is built on Java, Spring boot framework and MySQL DB.
-
+For detailed steps, refer to the [Developer Guide](https://piramal-swasthya.gitbook.io/amrit/developer-guide/development-environment-setup)
 ### Prerequisites
 * JDK 17
 * Wildfly 11
