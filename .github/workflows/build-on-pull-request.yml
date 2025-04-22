@@ -2,12 +2,12 @@ name: Build On Pull Request
 on:
   pull_request:
     branches: [ "feature/version/upgrade" ]
-    
+
 jobs:
   Build:
     runs-on: ubuntu-latest
     steps:
-    
+
       - name: Checkout code
         uses: actions/checkout@v3
         with:
