@@ -21,6 +21,7 @@
 */
 package com.iemr.inventory.data.user;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -38,12 +39,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.annotations.Expose;
 import com.iemr.inventory.utils.mapper.OutputMapper;
 
 @Entity
 @Table(name = "M_User")
-public class M_User {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class M_User implements Serializable {
 	
 	@Id
 	   @GeneratedValue(strategy = GenerationType.IDENTITY)

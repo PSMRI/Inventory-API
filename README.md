@@ -11,9 +11,9 @@ Inventory service acts as a medicine inventory management and dispensing unit th
 
 ## Building From Source
 This microservice is built on Java, Spring boot framework and MySQL DB.
-
+For detailed steps, refer to the [Developer Guide](https://piramal-swasthya.gitbook.io/amrit/developer-guide/development-environment-setup)
 ### Prerequisites
-* JDK 1.8
+* JDK 17
 * Wildfly 11
 * MySQL
 * Springboot V2
@@ -35,3 +35,12 @@ Open the application in your browser. The inventory module will be accessible at
 Inventory module can be used to track items, create purchase orders, generate inventory reports, and scan barcodes. To access the inventory module, navigate to http://localhost:3000/inventory in your browser. You will be able to view all of the items in your inventory, create purchase orders and generate inventory reports.
 
 All other features have been exposed as REST endpoints. Refer to the SWAGGER API specification for details.
+
+## Filing Issues
+
+If you encounter any issues, bugs, or have feature requests, please file them in the [main AMRIT repository](https://github.com/PSMRI/AMRIT/issues). Centralizing all feedback helps us streamline improvements and address concerns efficiently.  
+
+## Join Our Community
+
+We’d love to have you join our community discussions and get real-time support!  
+Join our [Discord server](https://discord.gg/FVQWsf5ENS) to connect with contributors, ask questions, and stay updated.  
