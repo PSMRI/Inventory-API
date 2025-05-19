@@ -4,8 +4,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.iemr.inventory</groupId>
-	<artifactId>Inventory-API</artifactId>
-	<version>1.1.4</version>
+	<artifactId>inventory-api</artifactId>
+	<version>3.1.0</version>
 	<packaging>war</packaging>
 	<name>Inventory-API</name>
 	<description>Inventory Page</description>
@@ -270,7 +270,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>Inventoryapi-v3.0.0</finalName>
+		<finalName>${artifactId}-${version}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.owasp</groupId>
