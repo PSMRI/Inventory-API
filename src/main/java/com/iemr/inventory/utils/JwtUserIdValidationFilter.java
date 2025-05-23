@@ -22,9 +22,12 @@ public class JwtUserIdValidationFilter implements Filter {
 
 	private final JwtAuthenticationUtil jwtAuthenticationUtil;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+	private final String allowedOrigins;
 
-	public JwtUserIdValidationFilter(JwtAuthenticationUtil jwtAuthenticationUtil) {
+	public JwtUserIdValidationFilter(JwtAuthenticationUtil jwtAuthenticationUtil,
+			@Value("${cors.allowed-origins}") String allowedOrigins) {
 		this.jwtAuthenticationUtil = jwtAuthenticationUtil;
+		this.allowedOrigins = allowedOrigins;
 	}
 
 	@Override
@@ -36,6 +39,20 @@ public class JwtUserIdValidationFilter implements Filter {
 		String path = request.getRequestURI();
 		String contextPath = request.getContextPath();
 		logger.info("JwtUserIdValidationFilter invoked for path: " + path);
+
+		String origin = request.getHeader("Origin");
+		if (origin != null && isOriginAllowed(origin)) {
+			response.setHeader("Access-Control-Allow-Origin", origin);
+			response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+			response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept, Jwttoken");
+			response.setHeader("Access-Control-Allow-Credentials", "true");
+		}
+
+		if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+			logger.info("OPTIONS request - skipping JWT validation");
+			response.setStatus(HttpServletResponse.SC_OK);
+			return;
+		}
 
 		// Log cookies for debugging
 		Cookie[] cookies = request.getCookies();
@@ -109,6 +126,17 @@ public class JwtUserIdValidationFilter implements Filter {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization error: " + e.getMessage());
 		}
 	}
+
+	private boolean isOriginAllowed(String origin) {
+		if (origin == null || allowedOrigins == null || allowedOrigins.trim().isEmpty()) {
+			logger.warn("No allowed origins configured or origin is null");
+			return false;
+		}
+
+		return Arrays.stream(allowedOrigins.split(",")).map(String::trim)
+				.anyMatch(pattern -> origin.matches(pattern.replace(".", "\\.").replace("*", ".*")));
+	}
+
 	private boolean isMobileClient(String userAgent) {
 		if (userAgent == null)
 			return false;
