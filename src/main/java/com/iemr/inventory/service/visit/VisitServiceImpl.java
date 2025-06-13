@@ -65,8 +65,7 @@ public class VisitServiceImpl implements VisitService {
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	private static HttpUtils httpUtils = new HttpUtils();
 	private InputMapper inputMapper = new InputMapper();
-	private String identityBaseURL = ConfigProperties.getPropertyByName("common-api-url");
-	private static final String COMMON_BASE_URL = "COMMON_BASE_URL";
+
 
 	@Override
 	public BeneficiaryModel getVisitDetail(String benrID, Integer providerservicemapID, String auth) throws Exception {
@@ -144,8 +143,7 @@ public class VisitServiceImpl implements VisitService {
 		String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
 		header.put("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
-		result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchBeneficiary")
-				.replace(COMMON_BASE_URL, identityBaseURL), benrID, header);
+		result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchBeneficiary"), benrID, header);
 		OutputResponse identityResponse = inputMapper.gson().fromJson(result, OutputResponse.class);
 		if (identityResponse.getStatusCode() == OutputResponse.USERID_FAILURE) {
 			throw new IEMRException(identityResponse.getErrorMessage());
