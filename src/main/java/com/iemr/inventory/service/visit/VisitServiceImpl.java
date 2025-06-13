@@ -109,8 +109,7 @@ public class VisitServiceImpl implements VisitService {
 		String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
 		header.put("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
-		result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchuserbyid")
-				.replace(COMMON_BASE_URL, identityBaseURL), benrID, header);
+		result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchuserbyid"), benrID, header);
 		OutputResponse identityResponse = inputMapper.gson().fromJson(result, OutputResponse.class);
 		if (identityResponse.getStatusCode() != 200) {
 			throw new InventoryException("Invalid BeneficiaryID");
