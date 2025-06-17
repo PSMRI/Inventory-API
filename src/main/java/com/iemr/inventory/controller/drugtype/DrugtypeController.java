@@ -28,7 +28,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,7 +48,6 @@ public class DrugtypeController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin()
 	@ApiOperation(value = "Create drug type", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/createDrugtype", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -73,7 +72,6 @@ public class DrugtypeController {
 
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get drug type", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getDrugtype", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -98,7 +96,6 @@ public class DrugtypeController {
 
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Edit drug type", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/editDrugtype", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -131,7 +128,6 @@ public class DrugtypeController {
 
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Delete drug type", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/deleteDrugtype", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })

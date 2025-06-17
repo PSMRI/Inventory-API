@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,7 +51,6 @@ public class VisitController {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get visit details from beneficary id", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getVisitFromBenID", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -78,7 +77,6 @@ public class VisitController {
 
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get visit details from advance search", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getVisitFromAdvanceSearch", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })

@@ -28,7 +28,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,7 +50,6 @@ public class SupplierMasterController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin()
 	@ApiOperation(value = "Create supplier", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/createSupplier", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -100,7 +99,6 @@ public class SupplierMasterController {
 
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get supplier", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getSupplier", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -125,7 +123,6 @@ public class SupplierMasterController {
 
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Edit supplier", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/editSupplier", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -163,7 +160,6 @@ public class SupplierMasterController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Delete supplier", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/deleteSupplier", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
