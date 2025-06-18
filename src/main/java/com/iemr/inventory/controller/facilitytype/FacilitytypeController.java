@@ -28,7 +28,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,7 +49,6 @@ public class FacilitytypeController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get facility", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getFacility", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -74,7 +73,6 @@ public class FacilitytypeController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Add facility", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/addFacility", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -99,7 +97,6 @@ public class FacilitytypeController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Edit facility", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/editFacility", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -131,7 +128,6 @@ public class FacilitytypeController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Delete facility", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/deleteFacility", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
