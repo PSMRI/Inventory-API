@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +54,6 @@ public class ItemController {
 	@Autowired
 	private ItemService itemService;
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get item form id", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getItemForm/{providerservicemapID}", headers = "Authorization", method = {
 			RequestMethod.GET }, produces = { "application/json" })
@@ -75,7 +74,6 @@ public class ItemController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get item route", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getItemRoute/{providerservicemapID}", headers = "Authorization", method = {
 			RequestMethod.GET }, produces = { "application/json" })
@@ -96,7 +94,6 @@ public class ItemController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get item category", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getItemCategory/{providerservicemapID}/{bool}", headers = "Authorization", method = {
 			RequestMethod.GET }, produces = { "application/json" })
@@ -123,7 +120,6 @@ public class ItemController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Create item master", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/createItemMaster", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -145,7 +141,6 @@ public class ItemController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get item master", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getItemMaster/{providerservicemapID}", headers = "Authorization", method = {
 			RequestMethod.GET }, produces = { "application/json" })
@@ -166,7 +161,6 @@ public class ItemController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get active item master", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getActiveItemMaster", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -187,7 +181,6 @@ public class ItemController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Block item master", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/blockItemMaster/{itemmasterid}/{deleteflag}", headers = "Authorization", method = {
 			RequestMethod.GET }, produces = { "application/json" })
@@ -209,7 +202,6 @@ public class ItemController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Discontinue item master", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/discontinueItemMaster/{itemmasterid}/{deleteflag}", headers = "Authorization", method = {
 			RequestMethod.GET }, produces = { "application/json" })
@@ -231,7 +223,6 @@ public class ItemController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Edit item master", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/editItemMaster", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -254,7 +245,6 @@ public class ItemController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Configure item issue", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/configItemIssue", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -276,7 +266,6 @@ public class ItemController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get item", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getItem", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })

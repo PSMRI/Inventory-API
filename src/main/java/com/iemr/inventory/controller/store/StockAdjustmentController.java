@@ -26,7 +26,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,7 +49,6 @@ public class StockAdjustmentController {
 	@Autowired
 	StockAdjustmentServiceImpl stockAdjustmentServiceImpl;
 
-	@CrossOrigin()
 	@ApiOperation(value = "Stock adjustment draft", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/stockadjustmentdraft", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -74,7 +73,6 @@ public class StockAdjustmentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get stock adjustment draft transaction", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getstockadjustmentdraftTransaction", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -95,7 +93,6 @@ public class StockAdjustmentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Edit stock adjustment draft transaction", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getforEditsStockAdjustmentdraftTransaction", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -116,7 +113,6 @@ public class StockAdjustmentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Stock adjustment", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/stockadjustment", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -139,7 +135,6 @@ public class StockAdjustmentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get stock adjustment transaction", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getStockAdjustmentTransaction", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -160,7 +155,6 @@ public class StockAdjustmentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Edit stock adjustment transaction", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getforEditsStockAdjustmentTransaction", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })

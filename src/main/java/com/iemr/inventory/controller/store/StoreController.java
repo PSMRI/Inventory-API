@@ -28,7 +28,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,7 +51,6 @@ public class StoreController {
 	@Autowired
 	private StoreService storeService;
 
-	@CrossOrigin()
 	@ApiOperation(value = "Create store", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/createStore", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -77,7 +76,6 @@ public class StoreController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Edit store", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/editStore", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -107,7 +105,6 @@ public class StoreController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get all store", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getAllStore/{providerServiceMapID}", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -127,7 +124,6 @@ public class StoreController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get all active store", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getAllActiveStore", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -147,7 +143,6 @@ public class StoreController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get main facility", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getMainFacility", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -170,7 +165,6 @@ public class StoreController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get sub facility", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getsubFacility", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -193,7 +187,6 @@ public class StoreController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Delete store", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/deleteStore", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -214,7 +207,6 @@ public class StoreController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get store by id", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getStoreByID", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -235,7 +227,6 @@ public class StoreController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get van by store id", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getVanByStoreID/{storeID}", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })

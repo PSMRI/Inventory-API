@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,7 +55,6 @@ public class IndentController {
 	@Autowired
 	IndentService IndentService;
 
-	@CrossOrigin()
 	@ApiOperation(value = "Partial search indent items", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/partialsearchindentitems", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -83,7 +82,6 @@ public class IndentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Create indent request", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/createIndentRequest", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -106,7 +104,6 @@ public class IndentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get indent history", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getIndentHistory", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -129,7 +126,6 @@ public class IndentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get order by indent id", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getOrdersByIndentID", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -152,7 +148,6 @@ public class IndentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get indent worklist", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getIndentWorklist", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -175,7 +170,6 @@ public class IndentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get indent order worklist", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getIndentOrderWorklist", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -199,7 +193,6 @@ public class IndentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Issue indent", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/issueIndent", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -222,7 +215,6 @@ public class IndentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Cancel indent order", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/cancelIndentOrder", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
@@ -245,7 +237,6 @@ public class IndentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Receive indent", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/receiveIndent", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
@@ -268,7 +259,6 @@ public class IndentController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Update indent order", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/updateIndentOrder", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
