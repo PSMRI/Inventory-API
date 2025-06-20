@@ -74,6 +74,9 @@ public class VisitServiceImpl implements VisitService {
 	BeneficiaryFlowStatusRepo beneficiaryFlowStatusRepo;
 	@Autowired
 	private CookieUtil cookieUtil;
+	
+	@Autowired
+	private RestTemplate restTemplate;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	private static HttpUtils httpUtils = new HttpUtils();
@@ -109,7 +112,7 @@ public class VisitServiceImpl implements VisitService {
 	public List<BeneficiaryModel> getBeneficiaryListByIDs(String benrID, String auth) throws Exception {
 
 	    List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<>();
-	    RestTemplate restTemplate = new RestTemplate();
+
 
 	    // Get JWT token from cookie
 	    HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
@@ -159,7 +162,6 @@ public class VisitServiceImpl implements VisitService {
 	public List<BeneficiaryModel> getBeneficiaryListBySearch(String benrID, String auth) throws IEMRException {
 
 	    List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<>();
-	    RestTemplate restTemplate = new RestTemplate();
 
 	    // Get JWT token from cookie
 	    HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
