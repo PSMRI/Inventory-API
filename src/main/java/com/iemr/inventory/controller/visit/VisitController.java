@@ -56,28 +56,31 @@ public class VisitController {
 			RequestMethod.POST }, produces = { "application/json" })
 	public String getVisitFromBenRegID(@RequestBody BenVisitDetail benVisitDetail, HttpServletRequest httpRequest) {
 
-		OutputResponse response = new OutputResponse();
-		String auth = httpRequest.getHeader("authorization");
+	    OutputResponse response = new OutputResponse();
+	    String auth = httpRequest.getHeader("authorization");
 
-		try {
-			logger.info("getVisitFromBenRegID recieved object " + benVisitDetail.toString());
+	    try {
+	        logger.info("getVisitFromBenRegID received object " + benVisitDetail.toString());
 
 	        String beneficiaryIDStr = benVisitDetail.getBeneficiaryID();
-	        if(beneficiaryIDStr == null || beneficiaryIDStr.trim().isEmpty() ) {
-	        	throw new IllegalArgumentException("Beneficiary ID cannot be null or empty");
+	        if (beneficiaryIDStr == null || beneficiaryIDStr.trim().isEmpty()) {
+	            throw new IllegalArgumentException("Beneficiary ID cannot be null or empty");
 	        }
-			BeneficiaryModel saveData = visitService.getVisitDetail(beneficiaryIDStr,
-					benVisitDetail.getProviderServiceMapID(), auth);
 
-			response.setResponse(saveData.toString());
+	        BeneficiaryModel saveData = visitService.getVisitDetail(
+	            beneficiaryIDStr,
+	            benVisitDetail.getProviderServiceMapID(),
+	            auth
+	        );
 
-		} catch (Exception e) {
-			response.setError(e);
-			logger.error("Error in getVisitFromBenID", e.getMessage());
+	        response.setResponse(saveData.toString());
 
-		}
-		return response.toString();
+	    } catch (Exception e) {
+	        response.setError(e);
+	        logger.error("Error in getVisitFromBenID", e.getMessage());
+	    }
 
+	    return response.toString();
 	}
 
 	@ApiOperation(value = "Get visit details from advance search", consumes = "application/json", produces = "application/json")
