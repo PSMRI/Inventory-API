@@ -106,11 +106,9 @@ public class VisitServiceImpl implements VisitService {
 		return beneficiaryModel;
 	}
 
-	
 	public List<BeneficiaryModel> getBeneficiaryListByIDs(String beneficiaryID, String auth) throws Exception {
 
 	    List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<>();
-
 
 	    // Get JWT token from cookie
 	    HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
@@ -125,12 +123,12 @@ public class VisitServiceImpl implements VisitService {
 	    }
 	    headers.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
-	    // Prepare JSON body with Gson or plain String
+	    // Prepare JSON body
 	    String jsonBody = "{\"beneficiaryID\":" + beneficiaryID + "}";
 
 	    HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
 
-		RestTemplate restTemplate = new RestTemplate();
+	    RestTemplate restTemplate = new RestTemplate();
 
 	    // Call the API
 	    ResponseEntity<String> response = restTemplate.exchange(
@@ -157,7 +155,6 @@ public class VisitServiceImpl implements VisitService {
 
 	    return listBenDetailForOutboundDTO;
 	}
-
 	
 	public List<BeneficiaryModel> getBeneficiaryListBySearch(String benrID, String auth) throws IEMRException {
 
