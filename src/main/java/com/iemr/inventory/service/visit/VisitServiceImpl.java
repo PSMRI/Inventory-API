@@ -126,8 +126,7 @@ public class VisitServiceImpl implements VisitService {
 	    headers.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
 	    // Prepare JSON body with Gson or plain String
-	   // String jsonBody = "{\"beneficiaryID\":" + beneficiaryID + "}";
-	    String jsonBody = "{\"beneficiaryID\": \"" + beneficiaryID + "\"}";
+	    String jsonBody = "{\"beneficiaryID\":" + beneficiaryID + "}";
 
 	    HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
 
