@@ -56,8 +56,8 @@ public class VisitController {
 			RequestMethod.POST }, produces = { "application/json" })
 	public String getVisitFromBenRegID(@RequestBody BenVisitDetail benVisitDetail, HttpServletRequest httpRequest) {
 
-		OutputResponse response = new OutputResponse();
-		String auth = httpRequest.getHeader("authorization");
+	    OutputResponse response = new OutputResponse();
+	    String auth = httpRequest.getHeader("authorization");
 
 		try {
 			logger.info("getVisitFromBenRegID recieved object " + benVisitDetail.toString());
@@ -67,15 +67,25 @@ public class VisitController {
 			BeneficiaryModel saveData = visitService.getVisitDetail(beneficiaryIDStr,
 					benVisitDetail.getProviderServiceMapID(), auth);
 
-			response.setResponse(saveData.toString());
+	        String beneficiaryIDStr = benVisitDetail.getBeneficiaryID();
+	        if (beneficiaryIDStr == null || beneficiaryIDStr.trim().isEmpty()) {
+	            throw new IllegalArgumentException("Beneficiary ID cannot be null or empty");
+	        }
 
-		} catch (Exception e) {
-			response.setError(e);
-			logger.error("Error in getVisitFromBenID", e.getMessage());
+	        BeneficiaryModel saveData = visitService.getVisitDetail(
+	            beneficiaryIDStr,
+	            benVisitDetail.getProviderServiceMapID(),
+	            auth
+	        );
 
-		}
-		return response.toString();
+	        response.setResponse(saveData.toString());
 
+	    } catch (Exception e) {
+	        response.setError(e);
+	        logger.error("Error in getVisitFromBenID", e.getMessage());
+	    }
+
+	    return response.toString();
 	}
 
 	@ApiOperation(value = "Get visit details from advance search", consumes = "application/json", produces = "application/json")
