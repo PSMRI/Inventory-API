@@ -67,16 +67,9 @@ public class VisitController {
 			BeneficiaryModel saveData = visitService.getVisitDetail(beneficiaryIDStr,
 					benVisitDetail.getProviderServiceMapID(), auth);
 
-	        String beneficiaryIDStr = benVisitDetail.getBeneficiaryID();
 	        if (beneficiaryIDStr == null || beneficiaryIDStr.trim().isEmpty()) {
 	            throw new IllegalArgumentException("Beneficiary ID cannot be null or empty");
 	        }
-
-	        BeneficiaryModel saveData = visitService.getVisitDetail(
-	            beneficiaryIDStr,
-	            benVisitDetail.getProviderServiceMapID(),
-	            auth
-	        );
 
 	        response.setResponse(saveData.toString());
 
