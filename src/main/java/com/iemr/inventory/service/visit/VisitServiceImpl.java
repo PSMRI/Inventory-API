@@ -82,10 +82,10 @@ public class VisitServiceImpl implements VisitService {
 
 
 	@Override
-	public BeneficiaryModel getVisitDetail(String benrID, Integer providerservicemapID, String auth) throws Exception {
+	public BeneficiaryModel getVisitDetail(String beneficiaryID, Integer providerservicemapID, String auth) throws Exception {
 		logger.info("Calling Common API : providerservicemapID" + providerservicemapID);
-		logger.info("Calling Common API : benrID" + benrID);
-		List<BeneficiaryModel> benModel = getBeneficiaryListByIDs(benrID, auth);
+		logger.info("Calling Common API : beneficiaryID" + beneficiaryID);
+		List<BeneficiaryModel> benModel = getBeneficiaryListByIDs(beneficiaryID, auth);
 		logger.info("Got result from API");
 		BeneficiaryModel beneficiaryModel = new BeneficiaryModel();
 		if (benModel.size() > 0) {
@@ -107,7 +107,7 @@ public class VisitServiceImpl implements VisitService {
 	}
 
 	
-	public List<BeneficiaryModel> getBeneficiaryListByIDs(String benrID, String auth) throws Exception {
+	public List<BeneficiaryModel> getBeneficiaryListByIDs(String beneficiaryID, String auth) throws Exception {
 
 	    List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<>();
 
@@ -126,7 +126,7 @@ public class VisitServiceImpl implements VisitService {
 	    headers.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
 	    // Prepare JSON body with Gson or plain String
-	    String jsonBody = "{\"beneficiaryRegID\":" + benrID + "}";
+	    String jsonBody = "{\"beneficiaryID\":" + beneficiaryID + "}";
 
 	    HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
 

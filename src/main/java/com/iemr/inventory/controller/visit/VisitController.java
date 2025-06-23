@@ -61,9 +61,10 @@ public class VisitController {
 
 		try {
 			logger.info("getVisitFromBenRegID recieved object " + benVisitDetail.toString());
-			BenVisitDetail newbenVisitDetail = new BenVisitDetail();
-			newbenVisitDetail.setBeneficiaryID(benVisitDetail.getBeneficiaryID());
-			BeneficiaryModel saveData = visitService.getVisitDetail(newbenVisitDetail.toString(),
+
+	        String beneficiaryIDStr = benVisitDetail.getBeneficiaryID();
+
+			BeneficiaryModel saveData = visitService.getVisitDetail(beneficiaryIDStr,
 					benVisitDetail.getProviderServiceMapID(), auth);
 
 			response.setResponse(saveData.toString());
