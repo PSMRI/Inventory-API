@@ -59,8 +59,13 @@ public class VisitController {
 	    OutputResponse response = new OutputResponse();
 	    String auth = httpRequest.getHeader("authorization");
 
-	    try {
-	        logger.info("getVisitFromBenRegID received object " + benVisitDetail.toString());
+		try {
+			logger.info("getVisitFromBenRegID recieved object " + benVisitDetail.toString());
+
+	        String beneficiaryIDStr = benVisitDetail.getBeneficiaryID();
+
+			BeneficiaryModel saveData = visitService.getVisitDetail(beneficiaryIDStr,
+					benVisitDetail.getProviderServiceMapID(), auth);
 
 	        String beneficiaryIDStr = benVisitDetail.getBeneficiaryID();
 	        if (beneficiaryIDStr == null || beneficiaryIDStr.trim().isEmpty()) {
