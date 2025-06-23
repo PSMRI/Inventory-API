@@ -60,6 +60,7 @@ public class VisitController {
 		String auth = httpRequest.getHeader("authorization");
 
 		try {
+			logger.info("getVisitFromBenRegID recieved object " + benVisitDetail.toString());
 
 	        String beneficiaryIDStr = benVisitDetail.getBeneficiaryID();
 
