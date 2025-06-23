@@ -126,7 +126,8 @@ public class VisitServiceImpl implements VisitService {
 	    headers.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
 	    // Prepare JSON body with Gson or plain String
-	    String jsonBody = "{\"beneficiaryID\":" + beneficiaryID + "}";
+	   // String jsonBody = "{\"beneficiaryID\":" + beneficiaryID + "}";
+	    String jsonBody = "{\"beneficiaryID\": \"" + beneficiaryID + "\"}";
 
 	    HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
 
@@ -151,7 +152,7 @@ public class VisitServiceImpl implements VisitService {
 	    JsonArray responseArray = responseObj.getAsJsonArray("data");
 
 	    for (JsonElement element : responseArray) {
-	        BeneficiaryModel beneficiary = inputMapper.gson().fromJson(element.toString(), BeneficiaryModel.class);
+	        BeneficiaryModel beneficiary = InputMapper.gson().fromJson(element.toString(), BeneficiaryModel.class);
 	        listBenDetailForOutboundDTO.add(beneficiary);
 	    }
 
