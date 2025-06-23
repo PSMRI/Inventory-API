@@ -72,12 +72,10 @@ public class VisitServiceImpl implements VisitService {
 
 	@Autowired(required = false)
 	BeneficiaryFlowStatusRepo beneficiaryFlowStatusRepo;
+	   
 	@Autowired
 	private CookieUtil cookieUtil;
 	
-	@Autowired
-	private RestTemplate restTemplate;
-
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	private static HttpUtils httpUtils = new HttpUtils();
 	private InputMapper inputMapper = new InputMapper();
@@ -132,6 +130,8 @@ public class VisitServiceImpl implements VisitService {
 
 	    HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
 
+		RestTemplate restTemplate = new RestTemplate();
+
 	    // Call the API
 	    ResponseEntity<String> response = restTemplate.exchange(
 	            commonApiUrlSearchUserById, HttpMethod.POST, requestEntity, String.class);
@@ -181,6 +181,8 @@ public class VisitServiceImpl implements VisitService {
 	    jsonBody.addProperty("benrID", benrID);
 
 	    HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody.toString(), headers);
+
+		RestTemplate restTemplate = new RestTemplate();
 
 	    // Send POST request
 	    ResponseEntity<String> response = restTemplate.exchange(
