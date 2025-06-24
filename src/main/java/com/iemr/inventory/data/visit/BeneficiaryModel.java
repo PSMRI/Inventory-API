@@ -25,9 +25,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import jakarta.persistence.Transient;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.gson.annotations.Expose;
+import com.iemr.inventory.to.provider.JsonUtils;
 import com.iemr.inventory.utils.mapper.OutputMapper;
 
 import lombok.Data;
@@ -176,7 +176,8 @@ public class BeneficiaryModel {
 
 	@Override
 	public String toString() {
-		return outputMapper.gson().toJson(this);
+		return JsonUtils.GSON.toJson(this);
+	
 	}
 	
 }
