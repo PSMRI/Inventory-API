@@ -27,6 +27,9 @@ import java.util.List;
 import jakarta.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.LongSerializationPolicy;
 import com.google.gson.annotations.Expose;
 import com.iemr.inventory.utils.mapper.OutputMapper;
 
@@ -176,7 +179,16 @@ public class BeneficiaryModel {
 
 	@Override
 	public String toString() {
-		return outputMapper.gson().toJson(this);
+		Gson gson = new GsonBuilder()
+	.excludeFieldsWithoutExposeAnnotation()
+	.setLongSerializationPolicy(LongSerializationPolicy.STRING)
+	.serializeNulls()
+	.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") // format dates without custom adapter
+	.create();
+
+	return gson.toJson(this);
+
+	
 	}
 	
 }
