@@ -191,7 +191,7 @@ public class VisitServiceImpl implements VisitService {
 
 	    // Parse and validate response
 	    JsonObject responseObj = InputMapper.gson().fromJson(responseStr, JsonObject.class);
-	    OutputResponse identityResponse = InputMapper.gson().fromJson(responseStr, OutputResponse.class);
+	    OutputResponse identityResponse = JsonUtils.GSON.fromJson(responseStr, OutputResponse.class);
 
 	    if (identityResponse.getStatusCode() == OutputResponse.USERID_FAILURE) {
 	        throw new IEMRException(identityResponse.getErrorMessage());
@@ -200,7 +200,7 @@ public class VisitServiceImpl implements VisitService {
 	    JsonArray responseArray = responseObj.getAsJsonArray("data");
 
 	    for (JsonElement jsonElement : responseArray) {
-	        BeneficiaryModel beneficiary = InputMapper.gson().fromJson(jsonElement.toString(), BeneficiaryModel.class);
+	        BeneficiaryModel beneficiary =  JsonUtils.GSON.fromJson(jsonElement, BeneficiaryModel.class);
 	        listBenDetailForOutboundDTO.add(beneficiary);
 	    }
 
