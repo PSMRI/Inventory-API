@@ -25,7 +25,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import jakarta.persistence.Transient;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.gson.annotations.Expose;
 import com.iemr.inventory.to.provider.JsonUtils;
