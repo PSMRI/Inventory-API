@@ -190,7 +190,7 @@ public class VisitServiceImpl implements VisitService {
 	    String responseStr = response.getBody();
 
 	    // Parse and validate response
-	    JsonObject responseObj = InputMapper.gson().fromJson(responseStr, JsonObject.class);
+	    JsonObject responseObj = JsonUtils.GSON.fromJson(responseStr, JsonObject.class);
 	    OutputResponse identityResponse = JsonUtils.GSON.fromJson(responseStr, OutputResponse.class);
 
 	    if (identityResponse.getStatusCode() == OutputResponse.USERID_FAILURE) {
