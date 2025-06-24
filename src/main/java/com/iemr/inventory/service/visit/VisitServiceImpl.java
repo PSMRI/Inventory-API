@@ -45,6 +45,7 @@ import com.google.gson.JsonObject;
 import com.iemr.inventory.data.visit.BeneficiaryModel;
 import com.iemr.inventory.repo.visit.BeneficiaryFlowStatusRepo;
 import com.iemr.inventory.repo.visit.VisitRepo;
+import com.iemr.inventory.to.provider.JsonUtils;
 import com.iemr.inventory.utils.CookieUtil;
 import com.iemr.inventory.utils.exception.IEMRException;
 import com.iemr.inventory.utils.exception.InventoryException;
@@ -110,12 +111,10 @@ public class VisitServiceImpl implements VisitService {
 
 	    List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<>();
 
-	    // Get JWT token from cookie
-	    HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-	            .getRequest();
-	    String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
+	    HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+	    String jwtTokenFromCookie = CookieUtil.getJwtTokenFromCookie(requestHeader);
 
-	    // Prepare headers
+	    // Set headers
 	    MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 	    headers.add("Content-Type", "application/json");
 	    if (auth != null) {
@@ -123,14 +122,12 @@ public class VisitServiceImpl implements VisitService {
 	    }
 	    headers.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
-	    // Prepare JSON body with Gson or plain String
+	    // Create JSON body
 	    String jsonBody = "{\"beneficiaryID\":" + beneficiaryID + "}";
 
 	    HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
-
 	    RestTemplate restTemplate = new RestTemplate();
 
-	    // Call the API
 	    ResponseEntity<String> response = restTemplate.exchange(
 	            commonApiUrlSearchUserById, HttpMethod.POST, requestEntity, String.class);
 
@@ -139,7 +136,7 @@ public class VisitServiceImpl implements VisitService {
 	    }
 
 	    String responseStr = response.getBody();
-	    JsonObject responseObj = InputMapper.gson().fromJson(responseStr, JsonObject.class);
+	    JsonObject responseObj = JsonUtils.GSON.fromJson(responseStr, JsonObject.class);
 
 	    int statusCode = responseObj.get("statusCode").getAsInt();
 	    if (statusCode != 200) {
@@ -149,12 +146,13 @@ public class VisitServiceImpl implements VisitService {
 	    JsonArray responseArray = responseObj.getAsJsonArray("data");
 
 	    for (JsonElement element : responseArray) {
-	        BeneficiaryModel beneficiary = InputMapper.gson().fromJson(element.toString(), BeneficiaryModel.class);
+	        BeneficiaryModel beneficiary = JsonUtils.GSON.fromJson(element, BeneficiaryModel.class);
 	        listBenDetailForOutboundDTO.add(beneficiary);
 	    }
 
 	    return listBenDetailForOutboundDTO;
 	}
+
 	
 	public List<BeneficiaryModel> getBeneficiaryListBySearch(String benrID, String auth) throws IEMRException {
 
