@@ -22,27 +22,31 @@
 package com.iemr.inventory.service.visit;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.iemr.inventory.data.visit.BeneficiaryModel;
 import com.iemr.inventory.repo.visit.BeneficiaryFlowStatusRepo;
 import com.iemr.inventory.repo.visit.VisitRepo;
+import com.iemr.inventory.to.provider.JsonUtils;
 import com.iemr.inventory.utils.CookieUtil;
-import com.iemr.inventory.utils.config.ConfigProperties;
 import com.iemr.inventory.utils.exception.IEMRException;
 import com.iemr.inventory.utils.exception.InventoryException;
 import com.iemr.inventory.utils.http.HttpUtils;
@@ -52,27 +56,37 @@ import com.iemr.inventory.utils.response.OutputResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
+@PropertySource("classpath:application.properties")
 public class VisitServiceImpl implements VisitService {
 
+
+	@Value("${common-api-url-searchBeneficiary}")
+	private String commonApiUrlSearchBeneficiary;
+	
+
+	@Value("${common-api-url-searchuserbyid}")
+	private String commonApiUrlSearchUserById;
+	
+	
 	@Autowired(required = false)
 	VisitRepo visitRepo;
 
 	@Autowired(required = false)
 	BeneficiaryFlowStatusRepo beneficiaryFlowStatusRepo;
+	   
 	@Autowired
 	private CookieUtil cookieUtil;
-
+	
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	private static HttpUtils httpUtils = new HttpUtils();
 	private InputMapper inputMapper = new InputMapper();
-	private String identityBaseURL = ConfigProperties.getPropertyByName("common-api-url");
-	private static final String COMMON_BASE_URL = "COMMON_BASE_URL";
+
 
 	@Override
-	public BeneficiaryModel getVisitDetail(String benrID, Integer providerservicemapID, String auth) throws Exception {
+	public BeneficiaryModel getVisitDetail(String beneficiaryID, Integer providerservicemapID, String auth) throws Exception {
 		logger.info("Calling Common API : providerservicemapID" + providerservicemapID);
-		logger.info("Calling Common API : benrID" + benrID);
-		List<BeneficiaryModel> benModel = getBeneficiaryListByIDs(benrID, auth);
+		logger.info("Calling Common API : beneficiaryID" + beneficiaryID);
+		List<BeneficiaryModel> benModel = getBeneficiaryListByIDs(beneficiaryID, auth);
 		logger.info("Got result from API");
 		BeneficiaryModel beneficiaryModel = new BeneficiaryModel();
 		if (benModel.size() > 0) {
@@ -93,77 +107,107 @@ public class VisitServiceImpl implements VisitService {
 		return beneficiaryModel;
 	}
 
-	public List<BeneficiaryModel> getBeneficiaryListByIDs(String benrID, String auth) throws Exception {
+	public List<BeneficiaryModel> getBeneficiaryListByIDs(String beneficiaryID, String auth) throws Exception {
 
-		List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<BeneficiaryModel>();
+	    List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<>();
 
-		JsonParser parser = new JsonParser();
+	    HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+	    String jwtTokenFromCookie = CookieUtil.getJwtTokenFromCookie(requestHeader);
 
-		String result;
-		HashMap<String, Object> header = new HashMap<>();
-		if (auth != null) {
-			header.put("Authorization", auth);
-		}
-		HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-				.getRequest();
-		String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
-		header.put("Cookie", "Jwttoken=" + jwtTokenFromCookie);
+	    // Set headers
+	    MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+	    headers.add("Content-Type", "application/json");
+	    if (auth != null) {
+	        headers.add("Authorization", auth);
+	    }
+	    headers.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
-		result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchuserbyid")
-				.replace(COMMON_BASE_URL, identityBaseURL), benrID, header);
-		OutputResponse identityResponse = inputMapper.gson().fromJson(result, OutputResponse.class);
-		if (identityResponse.getStatusCode() != 200) {
-			throw new InventoryException("Invalid BeneficiaryID");
-		}
-		JsonObject responseObj = (JsonObject) parser.parse(result);
+	    // Create JSON body
+	    String jsonBody = "{\"beneficiaryID\":" + beneficiaryID + "}";
 
-		JsonArray responseArray = responseObj.get("data").getAsJsonArray();
+	    HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
+	    RestTemplate restTemplate = new RestTemplate();
 
-		for (JsonElement jsonElement : responseArray) {
+	    ResponseEntity<String> response = restTemplate.exchange(
+	            commonApiUrlSearchUserById, HttpMethod.POST, requestEntity, String.class);
 
-			BeneficiaryModel callRequest = (BeneficiaryModel) inputMapper.gson().fromJson(jsonElement.toString(),
-					BeneficiaryModel.class);
-			listBenDetailForOutboundDTO.add(callRequest);
+	    if (response.getStatusCodeValue() != 200 || !response.hasBody()) {
+	        throw new InventoryException("No response or invalid status from beneficiary lookup service.");
+	    }
 
-		}
-		return listBenDetailForOutboundDTO;
+	    String responseStr = response.getBody();
+	    JsonObject responseObj = JsonUtils.GSON.fromJson(responseStr, JsonObject.class);
+
+	    int statusCode = responseObj.get("statusCode").getAsInt();
+	    if (statusCode != 200) {
+	        throw new InventoryException("Invalid BeneficiaryRegID");
+	    }
+
+	    JsonArray responseArray = responseObj.getAsJsonArray("data");
+
+	    for (JsonElement element : responseArray) {
+	        BeneficiaryModel beneficiary = JsonUtils.GSON.fromJson(element, BeneficiaryModel.class);
+	        listBenDetailForOutboundDTO.add(beneficiary);
+	    }
+
+	    return listBenDetailForOutboundDTO;
 	}
 
+	
 	public List<BeneficiaryModel> getBeneficiaryListBySearch(String benrID, String auth) throws IEMRException {
 
-		List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<BeneficiaryModel>();
+	    List<BeneficiaryModel> listBenDetailForOutboundDTO = new ArrayList<>();
 
-		JsonParser parser = new JsonParser();
+	    // Get JWT token from cookie
+	    HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+	            .getRequest();
+	    String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
 
-		String result;
-		HashMap<String, Object> header = new HashMap<>();
-		if (auth != null) {
-			header.put("Authorization", auth);
-		}
-		HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-				.getRequest();
-		String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
-		header.put("Cookie", "Jwttoken=" + jwtTokenFromCookie);
+	    // Prepare headers
+	    MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+	    headers.add("Content-Type", "application/json");
+	    if (auth != null) {
+	        headers.add("Authorization", auth);
+	    }
+	    headers.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
-		result = httpUtils.post(ConfigProperties.getPropertyByName("common-api-url-searchBeneficiary")
-				.replace(COMMON_BASE_URL, identityBaseURL), benrID, header);
-		OutputResponse identityResponse = inputMapper.gson().fromJson(result, OutputResponse.class);
-		if (identityResponse.getStatusCode() == OutputResponse.USERID_FAILURE) {
-			throw new IEMRException(identityResponse.getErrorMessage());
-		}
-		JsonObject responseObj = (JsonObject) parser.parse(result);
+	    // Build request body as JSON
+	    JsonObject jsonBody = new JsonObject();
+	    jsonBody.addProperty("benrID", benrID);
 
-		JsonArray responseArray = responseObj.get("data").getAsJsonArray();
+	    HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody.toString(), headers);
 
-		for (JsonElement jsonElement : responseArray) {
+		RestTemplate restTemplate = new RestTemplate();
 
-			BeneficiaryModel callRequest = (BeneficiaryModel) inputMapper.gson().fromJson(jsonElement.toString(),
-					BeneficiaryModel.class);
-			listBenDetailForOutboundDTO.add(callRequest);
+	    // Send POST request
+	    ResponseEntity<String> response = restTemplate.exchange(
+	            commonApiUrlSearchBeneficiary, HttpMethod.POST, requestEntity, String.class);
 
-		}
-		return listBenDetailForOutboundDTO;
+	    if (response.getStatusCodeValue() != 200 || !response.hasBody()) {
+	        throw new IEMRException("No response or invalid status from beneficiary search.");
+	    }
+
+	    String responseStr = response.getBody();
+
+	    // Parse and validate response
+	    JsonObject responseObj = JsonUtils.GSON.fromJson(responseStr, JsonObject.class);
+	    OutputResponse identityResponse = JsonUtils.GSON.fromJson(responseStr, OutputResponse.class);
+
+	    if (identityResponse.getStatusCode() == OutputResponse.USERID_FAILURE) {
+	        throw new IEMRException(identityResponse.getErrorMessage());
+	    }
+
+	    JsonArray responseArray = responseObj.getAsJsonArray("data");
+
+	    for (JsonElement jsonElement : responseArray) {
+	        BeneficiaryModel beneficiary =  JsonUtils.GSON.fromJson(jsonElement, BeneficiaryModel.class);
+	        listBenDetailForOutboundDTO.add(beneficiary);
+	    }
+
+	    return listBenDetailForOutboundDTO;
 	}
+
+
 
 	@Override
 	public List<BeneficiaryModel> getVisitFromAdvanceSearch(String beneficiaryModel, String auth) throws IEMRException {

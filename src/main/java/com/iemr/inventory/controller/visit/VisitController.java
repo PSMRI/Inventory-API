@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,34 +51,36 @@ public class VisitController {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get visit details from beneficary id", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getVisitFromBenID", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
 	public String getVisitFromBenRegID(@RequestBody BenVisitDetail benVisitDetail, HttpServletRequest httpRequest) {
 
-		OutputResponse response = new OutputResponse();
-		String auth = httpRequest.getHeader("authorization");
+	    OutputResponse response = new OutputResponse();
+	    String auth = httpRequest.getHeader("authorization");
 
 		try {
 			logger.info("getVisitFromBenRegID recieved object " + benVisitDetail.toString());
-			BenVisitDetail newbenVisitDetail = new BenVisitDetail();
-			newbenVisitDetail.setBeneficiaryID(benVisitDetail.getBeneficiaryID());
-			BeneficiaryModel saveData = visitService.getVisitDetail(newbenVisitDetail.toString(),
+
+	        String beneficiaryIDStr = benVisitDetail.getBeneficiaryID();
+
+			BeneficiaryModel saveData = visitService.getVisitDetail(beneficiaryIDStr,
 					benVisitDetail.getProviderServiceMapID(), auth);
 
-			response.setResponse(saveData.toString());
+	        if (beneficiaryIDStr == null || beneficiaryIDStr.trim().isEmpty()) {
+	            throw new IllegalArgumentException("Beneficiary ID cannot be null or empty");
+	        }
 
-		} catch (Exception e) {
-			response.setError(e);
-			logger.error("Error in getVisitFromBenID", e.getMessage());
+	        response.setResponse(saveData.toString());
 
-		}
-		return response.toString();
+	    } catch (Exception e) {
+	        response.setError(e);
+	        logger.error("Error in getVisitFromBenID", e.getMessage());
+	    }
 
+	    return response.toString();
 	}
 
-	@CrossOrigin()
 	@ApiOperation(value = "Get visit details from advance search", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getVisitFromAdvanceSearch", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
