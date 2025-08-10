@@ -41,7 +41,7 @@ public interface PatientIssueRepo extends CrudRepository<T_PatientIssue, Long> {
 
 	@Transactional
 	@Modifying
-	@Query(value = " UPDATE db_iemr.i_ben_flow_outreach SET pharmacist_flag = 9, Processed = 'U' "
+	@Query(value = " UPDATE i_ben_flow_outreach SET pharmacist_flag = 9, Processed = 'U' "
 			+ " WHERE beneficiary_reg_id = :benRegID AND beneficiary_visit_code = :benVisitCode ", nativeQuery = true)
 	public int updateBenStatusFlowAfterPharma(@Param("benRegID") Long benRegID,
 			@Param("benVisitCode") Long benVisitCode);
