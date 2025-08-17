@@ -39,3 +39,7 @@ src/main/environment/common_local.properties
 #local logs
 logs/
 app.log 
+
+### Node.js ###
+node_modules/
+npm-debug.log 
