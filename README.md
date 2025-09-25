@@ -36,7 +36,7 @@ Open the application in your browser. The inventory module will be accessible at
 This project uses Git hooks to enforce consistent code quality and commit message standards. Even though this is a Java project, the hooks are powered by Node.js. Follow these steps to set up the hooks locally:
 
 ### Prerequisites
-- Node.js (v14 or later)
+- Node.js (v18 or later)
 - npm (comes with Node.js)
 
 ### Setup Steps
