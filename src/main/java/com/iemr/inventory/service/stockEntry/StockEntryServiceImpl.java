@@ -148,13 +148,12 @@ public class StockEntryServiceImpl implements StockEntryService {
 			throws InventoryException {
 
 		List<AllocateItemMap> allocateItemMapList = new ArrayList<AllocateItemMap>();
-
+		logger.info("ItemStockExitList Size:" + itemStockExitList.size());
 		for (ItemStockExit itemStockExit : itemStockExitList) {
 			AllocateItemMap allocateItemMap = new AllocateItemMap();
 			List<ItemStockEntry> itemStockList = new ArrayList<ItemStockEntry>();
 
 			ItemMaster item = itemService.getItemMasterCatByID(itemStockExit.getItemID());
-
 
 			allocateItemMap.setFacilityID(item.getFacilityID());
 			allocateItemMap.setItemID(item.getItemID());
