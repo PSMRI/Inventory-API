@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,8 @@ public class CRMReportServiceImpl implements CRMReportService {
 
 	@Autowired(required=false)
 	InventoryReportMapper mapper;
+
+	private Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
 	@Override
 	public String getInwardStockReport(ItemStockEntryReport entryReport) {
@@ -98,9 +102,10 @@ public class CRMReportServiceImpl implements CRMReportService {
 						object[1] != null ? object[1].toString() : null,
 						object[2] != null ? object[2].toString() : null,
 						object[3] != null ? object[3].toString() : null,
-						object[4] != null ? Double.valueOf(object[4].toString()) : null,
-						(Date) (object[5] != null ? object[5] : null),
-						(Integer) (object[6] != null ? object[6] : null));
+						object[4] != null ? object[4].toString() : null,
+						object[5] != null ? Double.valueOf(object[5].toString()) : null,
+						(Date) (object[6] != null ? object[6] : null),
+						(Integer) (object[7] != null ? object[7] : null));
 
 				report.setSlNo(slNo++);
 				reportList.add(report);
@@ -618,6 +623,10 @@ public class CRMReportServiceImpl implements CRMReportService {
 			list = itemStockReportRepo.getShortExpiryReport(startExpiry);
 		}
 
+		logger.info("Short Expiry Report Start Date: " + startExpiry + " End Date: " + endExpiry);
+
+		logger.info("Short Expiry Report List Size: " + list.size());
+
 		Long slNo = 1L;
 
 		for (Object[] object : list) {
@@ -627,9 +636,10 @@ public class CRMReportServiceImpl implements CRMReportService {
 						object[1] != null ? object[1].toString() : null,
 						object[2] != null ? object[2].toString() : null,
 						object[3] != null ? object[3].toString() : null,
-						object[4] != null ? ((BigDecimal) object[4]).doubleValue() : null,
-						(Date) (object[5] != null ? object[5] : null),
-						(Integer) (object[6] != null ? object[6] : null));
+						object[4] != null ? object[4].toString() : null,
+						object[5] != null ? ((BigDecimal) object[5]).doubleValue() : null,
+						(Date) (object[6] != null ? object[6] : null),
+						(Integer) (object[7] != null ? object[7] : null));
 
 				report.setSlNo(slNo++);
 				reportList.add(report);

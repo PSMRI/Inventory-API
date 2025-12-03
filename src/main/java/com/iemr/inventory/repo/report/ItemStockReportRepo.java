@@ -99,11 +99,11 @@ public interface ItemStockReportRepo extends CrudRepository<ItemStockEntryReport
 	List<Object[]> getDailyStockSummaryReportByFacilityID(@Param("startDate") Date startDate,
 			@Param("endDate") Date endDate, @Param("facilityID") Integer facilityID);
 
-	@Query(value="Select distinct FacilityName, ItemName, ItemCategoryName, BatchNo, UnitCostPrice, ExpiryDate, QuantityInHand from db_reporting.fact_itemstockentry "
+	@Query(value="Select distinct FacilityName, ItemName, ItemCategoryName, Strength, BatchNo, UnitCostPrice, ExpiryDate, QuantityInHand from db_reporting.fact_itemstockentry "
 			+ "where ExpiryDate >= :startDate and ExpiryDate <= adddate(:startDate,AlertBeforeDays) and Deleted=false order by ExpiryDate asc",nativeQuery=true)
 	List<Object[]> getShortExpiryReport(@Param("startDate") Date startDate);
 
-	@Query(value="Select distinct FacilityName, ItemName, ItemCategoryName, BatchNo, UnitCostPrice, ExpiryDate, QuantityInHand from db_reporting.fact_itemstockentry "
+	@Query(value="Select distinct FacilityName, ItemName, ItemCategoryName, Strength, BatchNo, UnitCostPrice, ExpiryDate, QuantityInHand from db_reporting.fact_itemstockentry "
 			+ "where ExpiryDate >= :startDate and ExpiryDate <= adddate(:startDate,AlertBeforeDays) and FacilityID = :facilityID and Deleted=false order by ExpiryDate asc",nativeQuery=true)
 	List<Object[]> getShortExpiryReportByFacilityID(@Param("startDate") Date startDate,
 			@Param("facilityID") Integer facilityID);
