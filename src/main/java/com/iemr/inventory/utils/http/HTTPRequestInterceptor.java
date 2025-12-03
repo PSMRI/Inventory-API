@@ -24,6 +24,7 @@ package com.iemr.inventory.utils.http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -36,11 +37,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.MediaType;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 
 @Component
 public class HTTPRequestInterceptor implements HandlerInterceptor {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+
+	@Value("${cors.allowed-origins}")
+	private String allowedOrigins;
+	
 	@Autowired
 	private RedisStorage redisStorage;
 
@@ -105,7 +111,13 @@ public class HTTPRequestInterceptor implements HandlerInterceptor {
 
 				response.setContentType(MediaType.APPLICATION_JSON);
 
-				response.setHeader("Access-Control-Allow-Origin", "*");
+				String origin = request.getHeader("Origin");
+				if (origin != null && isOriginAllowed(origin)) {
+					response.setHeader("Access-Control-Allow-Origin", origin);
+					response.setHeader("Access-Control-Allow-Credentials", "true");
+				} else if (origin != null) {
+					logger.warn("CORS headers NOT added for error response | Unauthorized origin: {}", origin);
+				}
 				status = false;
 			}
 		}
@@ -142,6 +154,21 @@ public class HTTPRequestInterceptor implements HandlerInterceptor {
 			throws Exception {
 		logger.info("http interceptor - after completion");
 
+	}
+
+		private boolean isOriginAllowed(String origin) {
+		if (origin == null || allowedOrigins == null || allowedOrigins.trim().isEmpty()) {
+			return false;
+		}
+
+		return Arrays.stream(allowedOrigins.split(","))
+				.map(String::trim)
+				.anyMatch(pattern -> {
+					String regex = pattern
+							.replace(".", "\\.")
+							.replace("*", ".*");
+					return origin.matches(regex);
+				});
 	}
 
 }
