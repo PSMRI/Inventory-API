@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.iemr.inventory</groupId>
 	<artifactId>inventory-api</artifactId>
-	<version>3.5.0</version>
+	<version>3.6.0</version>
 	<packaging>war</packaging>
 	<name>Inventory-API</name>
 	<description>Inventory Page</description>
