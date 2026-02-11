@@ -30,12 +30,10 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.context.annotation.Profile;
 import com.iemr.inventory.data.user.M_User;
 
 @Configuration
 @EnableCaching
-@Profile("!swagger")
 public class RedisConfig {
 
 	private @Value("${spring.data.redis.host}") String redisHost;
@@ -47,7 +45,6 @@ public class RedisConfig {
 	}
 
 	@Bean
-	@Profile("!swagger")
 	public RedisTemplate<String, M_User> redisTemplate(RedisConnectionFactory factory) {
 		RedisTemplate<String, M_User> template = new RedisTemplate<>();
 		template.setConnectionFactory(factory);
