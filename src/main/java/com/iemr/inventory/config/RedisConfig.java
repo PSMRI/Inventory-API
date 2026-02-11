@@ -47,6 +47,7 @@ public class RedisConfig {
 	}
 
 	@Bean
+	@Profile("!swagger")
 	public RedisTemplate<String, M_User> redisTemplate(RedisConnectionFactory factory) {
 		RedisTemplate<String, M_User> template = new RedisTemplate<>();
 		template.setConnectionFactory(factory);
