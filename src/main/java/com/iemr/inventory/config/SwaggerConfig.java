@@ -16,6 +16,7 @@ import io.swagger.v3.oas.models.servers.Server;
 @Configuration
 public class SwaggerConfig {
     private static final String DEFAULT_SERVER_URL = "http://localhost:9090";
+    private static final String BEARER_AUTH_SCHEME = "bearerAuth";
 
     @Bean
     public OpenAPI customOpenAPI(Environment env) {
@@ -24,9 +25,9 @@ public class SwaggerConfig {
         String demoUrl = env.getProperty("api.demo.url", DEFAULT_SERVER_URL);
         return new OpenAPI()
             .info(new Info().title("Inventory API").version("version").description("A microservice for inventory management of items, stock levels, and related operations."))
-            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-            .components(new Components().addSecuritySchemes("bearerAuth",
-                new SecurityScheme().name("bearerAuth").type(SecurityScheme.Type.HTTP).scheme("bearer")))
+            .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH_SCHEME))
+            .components(new Components().addSecuritySchemes(BEARER_AUTH_SCHEME,
+                new SecurityScheme().name(BEARER_AUTH_SCHEME).type(SecurityScheme.Type.HTTP).scheme("bearer")))
             .servers(List.of(
                 new Server().url(devUrl).description("Dev"),
                 new Server().url(uatUrl).description("UAT"),
