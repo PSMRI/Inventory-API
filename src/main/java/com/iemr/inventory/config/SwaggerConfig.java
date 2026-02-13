@@ -7,8 +7,11 @@ import org.springframework.core.env.Environment;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import java.util.List;
+import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class SwaggerConfig {
@@ -20,14 +23,14 @@ public class SwaggerConfig {
         String uatUrl = env.getProperty("api.uat.url", DEFAULT_SERVER_URL);
         String demoUrl = env.getProperty("api.demo.url", DEFAULT_SERVER_URL);
         return new OpenAPI()
-            .info(new Info().title("Inventory API").version("version").description("A microservice for the creation and management of beneficiaries."))
-            .addSecurityItem(new SecurityRequirement().addList("my security"))
-            .components(new Components().addSecuritySchemes("my security",
-                new SecurityScheme().name("my security").type(SecurityScheme.Type.HTTP).scheme("bearer")))
-            .servers(java.util.Arrays.asList(
-                new io.swagger.v3.oas.models.servers.Server().url(devUrl).description("Dev"),
-                new io.swagger.v3.oas.models.servers.Server().url(uatUrl).description("UAT"),
-                new io.swagger.v3.oas.models.servers.Server().url(demoUrl).description("Demo")
+            .info(new Info().title("Inventory API").version("version").description("A microservice for inventory management of items, stock levels, and related operations."))
+            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+            .components(new Components().addSecuritySchemes("bearerAuth",
+                new SecurityScheme().name("bearerAuth").type(SecurityScheme.Type.HTTP).scheme("bearer")))
+            .servers(List.of(
+                new Server().url(devUrl).description("Dev"),
+                new Server().url(uatUrl).description("UAT"),
+                new Server().url(demoUrl).description("Demo")
             ));
     }
 
