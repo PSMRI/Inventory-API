@@ -64,7 +64,7 @@ public class HealthController {
             Map<String, Object> healthStatus = healthService.checkHealth();
             String overallStatus = (String) healthStatus.get("status");
             
-            HttpStatus httpStatus = "UP".equals(overallStatus) ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE;
+            HttpStatus httpStatus = "DOWN".equals(overallStatus) ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.OK;
             
             logger.debug("Health check completed with status: {}", overallStatus);
             return new ResponseEntity<>(healthStatus, httpStatus);
