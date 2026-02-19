@@ -98,16 +98,35 @@ public class HealthService {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("timestamp", Instant.now().toString());
         
-        Map<String, Map<String, Object>> components = new LinkedHashMap<>();
-        
-        // Check MySQL
         Map<String, Object> mysqlStatus = new LinkedHashMap<>();
-        performHealthCheck("MySQL", mysqlStatus, this::checkMySQLHealth);
-        components.put("mysql", mysqlStatus);
-        
-        // Check Redis
         Map<String, Object> redisStatus = new LinkedHashMap<>();
-        performHealthCheck("Redis", redisStatus, this::checkRedisHealth);
+        
+        // Submit both checks concurrently
+        CompletableFuture<Void> mysqlFuture = CompletableFuture.runAsync(
+            () -> performHealthCheck("MySQL", mysqlStatus, this::checkMySQLHealthSync), executorService);
+        CompletableFuture<Void> redisFuture = CompletableFuture.runAsync(
+            () -> performHealthCheck("Redis", redisStatus, this::checkRedisHealthSync), executorService);
+        
+        // Wait for both checks to complete with combined timeout
+        long maxTimeout = Math.max(MYSQL_TIMEOUT_SECONDS, REDIS_TIMEOUT_SECONDS) + 1;
+        try {
+            CompletableFuture.allOf(mysqlFuture, redisFuture)
+                .get(maxTimeout, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            logger.warn("Health check aggregate timeout after {} seconds", maxTimeout);
+            mysqlFuture.cancel(true);
+            redisFuture.cancel(true);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warn("Health check was interrupted");
+            mysqlFuture.cancel(true);
+            redisFuture.cancel(true);
+        } catch (Exception e) {
+            logger.warn("Health check execution error: {}", e.getMessage());
+        }
+        
+        Map<String, Map<String, Object>> components = new LinkedHashMap<>();
+        components.put("mysql", mysqlStatus);
         components.put("redis", redisStatus);
         
         response.put("components", components);
@@ -119,29 +138,54 @@ public class HealthService {
         return response;
     }
 
-    private HealthCheckResult checkMySQLHealth() {
-        CompletableFuture<HealthCheckResult> future = CompletableFuture.supplyAsync(() -> {
-            try (Connection connection = dataSource.getConnection();
-                 PreparedStatement stmt = connection.prepareStatement("SELECT 1 as health_check")) {
-                
-                stmt.setQueryTimeout((int) MYSQL_TIMEOUT_SECONDS);
-                
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        return new HealthCheckResult(true, null);
-                    }
+    private HealthCheckResult checkMySQLHealthSync() {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement stmt = connection.prepareStatement("SELECT 1 as health_check")) {
+            
+            stmt.setQueryTimeout((int) MYSQL_TIMEOUT_SECONDS);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new HealthCheckResult(true, null);
                 }
-                
-                return new HealthCheckResult(false, "No result from health check query");
-                
-            } catch (Exception e) {
-                logger.warn("MySQL health check failed: {}", e.getMessage(), e);
-                return new HealthCheckResult(false, "MySQL connection failed");
             }
-        }, executorService);
+            
+            return new HealthCheckResult(false, "No result from health check query");
+            
+        } catch (Exception e) {
+            logger.warn("MySQL health check failed: {}", e.getMessage(), e);
+            return new HealthCheckResult(false, "MySQL connection failed");
+        }
+    }
+
+    private HealthCheckResult checkRedisHealthSync() {
+        if (redisTemplate == null) {
+            return new HealthCheckResult(true, "Redis not configured — skipped");
+        }
         
         try {
-            return future.get(MYSQL_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            String pong = redisTemplate.execute((org.springframework.data.redis.core.RedisCallback<String>) (connection) -> connection.ping());
+            
+            if ("PONG".equals(pong)) {
+                return new HealthCheckResult(true, null);
+            }
+            
+            return new HealthCheckResult(false, "Redis PING failed");
+            
+        } catch (Exception e) {
+            logger.warn("Redis health check failed: {}", e.getMessage(), e);
+            return new HealthCheckResult(false, "Redis connection failed");
+        }
+    }
+
+    // Deprecated: kept for backward compatibility, use synchronous versions instead
+    @Deprecated
+    private HealthCheckResult checkMySQLHealth() {
+        CompletableFuture<HealthCheckResult> future = CompletableFuture.supplyAsync(
+            this::checkMySQLHealthSync, executorService);
+        
+        try {
+            return future.get(MYSQL_TIMEOUT_SECONDS + 1, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
             logger.warn("MySQL health check timed out after {} seconds", MYSQL_TIMEOUT_SECONDS);
@@ -156,39 +200,20 @@ public class HealthService {
         }
     }
 
+    @Deprecated
     private HealthCheckResult checkRedisHealth() {
-        if (redisTemplate == null) {
-            return new HealthCheckResult(true, "Redis not configured — skipped");
-        }
+        CompletableFuture<HealthCheckResult> future = CompletableFuture.supplyAsync(
+            this::checkRedisHealthSync, executorService);
         
-        CompletableFuture<String> future = null;
         try {
-            future = CompletableFuture.supplyAsync(() -> {
-                try {
-                    return redisTemplate.execute((org.springframework.data.redis.core.RedisCallback<String>) (connection) -> connection.ping());
-                } catch (Exception e) {
-                    logger.debug("Redis PING failed: {}", e.getMessage(), e);
-                    return null;
-                }
-            }, executorService);
-            
-            String pong = future.get(REDIS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            
-            if ("PONG".equals(pong)) {
-                return new HealthCheckResult(true, null);
-            }
-            
-            return new HealthCheckResult(false, "Redis PING failed");
-            
+            return future.get(REDIS_TIMEOUT_SECONDS + 1, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
-            if (future != null) {
-                future.cancel(true);
-            }
+            future.cancel(true);
             logger.warn("Redis health check timed out after {} seconds", REDIS_TIMEOUT_SECONDS);
             return new HealthCheckResult(false, "Redis health check timed out");
         } catch (InterruptedException e) {
-            logger.warn("Redis health check was interrupted");
             Thread.currentThread().interrupt();
+            logger.warn("Redis health check was interrupted");
             return new HealthCheckResult(false, "Redis health check was interrupted");
         } catch (Exception e) {
             logger.warn("Redis health check failed: {}", e.getMessage(), e);
@@ -215,9 +240,12 @@ public class HealthService {
             String severity = determineSeverity(result.isHealthy, responseTime);
             status.put(SEVERITY_KEY, severity);
             
-            // Include error message if present (sanitized)
+            // Include message or error based on health status
             if (result.error != null) {
-                status.put("error", result.error);
+                // Use "message" key for informational messages when healthy
+                // Use "error" key for actual error messages when unhealthy
+                String fieldKey = result.isHealthy ? "message" : "error";
+                status.put(fieldKey, result.error);
             }
             
             return status;
