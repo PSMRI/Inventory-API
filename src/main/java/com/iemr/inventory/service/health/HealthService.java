@@ -53,7 +53,8 @@ public class HealthService {
     private static final String STATUS_DOWN = "DOWN";
     private static final String STATUS_DEGRADED = "DEGRADED";
     
-    // Severity levels
+    // Severity levels and keys
+    private static final String SEVERITY_KEY = "severity";
     private static final String SEVERITY_OK = "OK";
     private static final String SEVERITY_WARNING = "WARNING";
     private static final String SEVERITY_CRITICAL = "CRITICAL";
@@ -212,7 +213,7 @@ public class HealthService {
             
             // Determine severity based on response time and status
             String severity = determineSeverity(result.isHealthy, responseTime);
-            status.put("severity", severity);
+            status.put(SEVERITY_KEY, severity);
             
             // Include error message if present (sanitized)
             if (result.error != null) {
@@ -227,7 +228,7 @@ public class HealthService {
             
             status.put(STATUS_KEY, STATUS_DOWN);
             status.put("responseTimeMs", responseTime);
-            status.put("severity", SEVERITY_CRITICAL);
+            status.put(SEVERITY_KEY, SEVERITY_CRITICAL);
             status.put("error", "Health check failed with an unexpected error");
             
             return status;
@@ -259,7 +260,7 @@ public class HealthService {
         
         for (Map<String, Object> componentStatus : components.values()) {
             String status = (String) componentStatus.get(STATUS_KEY);
-            String severity = (String) componentStatus.get("severity");
+            String severity = (String) componentStatus.get(SEVERITY_KEY);
             
             if (STATUS_DOWN.equals(status) || SEVERITY_CRITICAL.equals(severity)) {
                 hasCritical = true;
