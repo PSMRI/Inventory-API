@@ -180,8 +180,11 @@ public class HealthService {
 
     /**
      * Deprecated: kept for backward compatibility, use synchronous versions instead.
+     * <p>
+     * This method will be removed in version 4.0.0. Use {@link #checkMySQLHealthSync()} instead.
+     * </p>
      *
-     * @deprecated Use {@link #checkMySQLHealthSync()} instead.
+     * @deprecated Since version 3.6.0. Scheduled for removal in version 4.0.0.
      */
     @Deprecated(since = "3.6.0", forRemoval = true)
     private HealthCheckResult checkMySQLHealth() {
@@ -206,8 +209,11 @@ public class HealthService {
 
     /**
      * Deprecated: kept for backward compatibility, use synchronous versions instead.
+     * <p>
+     * This method will be removed in version 4.0.0. Use {@link #checkRedisHealthSync()} instead.
+     * </p>
      *
-     * @deprecated Use {@link #checkRedisHealthSync()} instead.
+     * @deprecated Since version 3.6.0. Scheduled for removal in version 4.0.0.
      */
     @Deprecated(since = "3.6.0", forRemoval = true)
     private HealthCheckResult checkRedisHealth() {
