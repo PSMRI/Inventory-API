@@ -178,8 +178,7 @@ public class HealthService {
         }
     }
 
-    // Deprecated: kept for backward compatibility, use synchronous versions instead
-    @Deprecated
+    @Deprecated(since = "3.6.0", forRemoval = true)
     private HealthCheckResult checkMySQLHealth() {
         CompletableFuture<HealthCheckResult> future = CompletableFuture.supplyAsync(
             this::checkMySQLHealthSync, executorService);
@@ -200,7 +199,7 @@ public class HealthService {
         }
     }
 
-    @Deprecated
+    @Deprecated(since = "3.6.0", forRemoval = true)
     private HealthCheckResult checkRedisHealth() {
         CompletableFuture<HealthCheckResult> future = CompletableFuture.supplyAsync(
             this::checkRedisHealthSync, executorService);
@@ -263,13 +262,6 @@ public class HealthService {
         }
     }
 
-    /**
-     * Determine severity level based on component health and response time.
-     * 
-     * @param isHealthy true if component is healthy
-     * @param responseTimeMs response time in milliseconds
-     * @return severity level: OK, WARNING, or CRITICAL
-     */
     private String determineSeverity(boolean isHealthy, long responseTimeMs) {
         if (!isHealthy) {
             return SEVERITY_CRITICAL;
