@@ -59,6 +59,11 @@ public class HealthService {
     private static final String SEVERITY_WARNING = "WARNING";
     private static final String SEVERITY_CRITICAL = "CRITICAL";
     
+    // Response keys
+    private static final String ERROR_KEY = "error";
+    private static final String MESSAGE_KEY = "message";
+    private static final String RESPONSE_TIME_KEY = "responseTimeMs";
+    
     // Timeouts (in seconds)
     private static final long MYSQL_TIMEOUT_SECONDS = 3;
     private static final long REDIS_TIMEOUT_SECONDS = 3;
@@ -146,7 +151,7 @@ public class HealthService {
         if (!status.containsKey(STATUS_KEY)) {
             status.put(STATUS_KEY, STATUS_DOWN);
             status.put(SEVERITY_KEY, SEVERITY_CRITICAL);
-            status.put("error", componentName + " health check did not complete in time");
+            status.put(ERROR_KEY, componentName + " health check did not complete in time");
         }
     }
 
@@ -261,7 +266,7 @@ public class HealthService {
             status.put(STATUS_KEY, result.isHealthy ? STATUS_UP : STATUS_DOWN);
             
             // Set response time
-            status.put("responseTimeMs", responseTime);
+            status.put(RESPONSE_TIME_KEY, responseTime);
             
             // Determine severity based on response time and status
             String severity = determineSeverity(result.isHealthy, responseTime);
@@ -269,9 +274,9 @@ public class HealthService {
             
             // Include message or error based on health status
             if (result.error != null) {
-                // Use "message" key for informational messages when healthy
-                // Use "error" key for actual error messages when unhealthy
-                String fieldKey = result.isHealthy ? "message" : "error";
+                // Use MESSAGE_KEY for informational messages when healthy
+                // Use ERROR_KEY for actual error messages when unhealthy
+                String fieldKey = result.isHealthy ? MESSAGE_KEY : ERROR_KEY;
                 status.put(fieldKey, result.error);
             }
             
@@ -282,9 +287,9 @@ public class HealthService {
             logger.error("{} health check failed with exception: {}", componentName, e.getMessage(), e);
             
             status.put(STATUS_KEY, STATUS_DOWN);
-            status.put("responseTimeMs", responseTime);
+            status.put(RESPONSE_TIME_KEY, responseTime);
             status.put(SEVERITY_KEY, SEVERITY_CRITICAL);
-            status.put("error", "Health check failed with an unexpected error");
+            status.put(ERROR_KEY, "Health check failed with an unexpected error");
             
             return status;
         }
