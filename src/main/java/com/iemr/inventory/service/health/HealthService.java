@@ -125,6 +125,10 @@ public class HealthService {
             logger.warn("Health check execution error: {}", e.getMessage());
         }
         
+        // Ensure timed-out or unfinished components are marked DOWN
+        ensurePopulated(mysqlStatus, "MySQL");
+        ensurePopulated(redisStatus, "Redis");
+        
         Map<String, Map<String, Object>> components = new LinkedHashMap<>();
         components.put("mysql", mysqlStatus);
         components.put("redis", redisStatus);
@@ -136,6 +140,14 @@ public class HealthService {
         response.put(STATUS_KEY, overallStatus);
         
         return response;
+    }
+
+    private void ensurePopulated(Map<String, Object> status, String componentName) {
+        if (!status.containsKey(STATUS_KEY)) {
+            status.put(STATUS_KEY, STATUS_DOWN);
+            status.put(SEVERITY_KEY, SEVERITY_CRITICAL);
+            status.put("error", componentName + " health check did not complete in time");
+        }
     }
 
     private HealthCheckResult checkMySQLHealthSync() {
