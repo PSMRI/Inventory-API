@@ -178,6 +178,11 @@ public class HealthService {
         }
     }
 
+    /**
+     * Deprecated: kept for backward compatibility, use synchronous versions instead.
+     *
+     * @deprecated Use {@link #checkMySQLHealthSync()} instead.
+     */
     @Deprecated(since = "3.6.0", forRemoval = true)
     private HealthCheckResult checkMySQLHealth() {
         CompletableFuture<HealthCheckResult> future = CompletableFuture.supplyAsync(
@@ -199,6 +204,11 @@ public class HealthService {
         }
     }
 
+    /**
+     * Deprecated: kept for backward compatibility, use synchronous versions instead.
+     *
+     * @deprecated Use {@link #checkRedisHealthSync()} instead.
+     */
     @Deprecated(since = "3.6.0", forRemoval = true)
     private HealthCheckResult checkRedisHealth() {
         CompletableFuture<HealthCheckResult> future = CompletableFuture.supplyAsync(
