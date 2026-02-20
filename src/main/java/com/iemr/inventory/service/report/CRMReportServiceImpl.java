@@ -223,31 +223,31 @@ public class CRMReportServiceImpl implements CRMReportService {
 					openingStock = ((Number) objects[10]).longValue();
 				}
 				Long adjustedQuantity_FromDate = 0L;
-				if (objects[11] != null) {
-					adjustedQuantity_FromDate = ((Number) objects[11]).longValue();
+				if (objects[15] != null) {
+					adjustedQuantity_FromDate = ((Number) objects[15]).longValue();
 				}
 				Long quantityDispanced = 0L;
-				if (objects[12] != null) {
-					quantityDispanced = ((Number) objects[12]).longValue();
+				if (objects[11] != null) {
+					quantityDispanced = ((Number) objects[11]).longValue();
 				}
-				String itemName = (String) objects[13];
-				String facilityName = (String) objects[14];
-				String itemCategoryName = (String) objects[15];
+				String itemName = (String) objects[12];
+				String facilityName = (String) objects[13];
+				String itemCategoryName = (String) objects[14];
 				Long adjustedQuantity_ToDate = 0L;
-				if (objects[16] != null) {
-					adjustedQuantity_ToDate = ((Number) objects[16]).longValue();
+				if (objects[15] != null) {
+					adjustedQuantity_ToDate = ((Number) objects[15]).longValue();
 				}
 				Long adjustedQuantity_ToDate_Receipt = 0L;
-				if (objects[17] != null) {
-					adjustedQuantity_ToDate_Receipt = ((Number) objects[17]).longValue();
+				if (objects[16] != null) {
+					adjustedQuantity_ToDate_Receipt = ((Number) objects[16]).longValue();
 				}
 				Long adjustedQuantity_ToDate_Issue = 0L;
-				if (objects[18] != null) {
-					adjustedQuantity_ToDate_Issue = ((Number) objects[18]).longValue();
+				if (objects[17] != null) {
+					adjustedQuantity_ToDate_Issue = ((Number) objects[17]).longValue();
 				}
 				Long ClosingStock = 0L;
-				if (objects[19] != null) {
-					ClosingStock = ((Number) objects[19]).longValue();
+				if (objects[18] != null) {
+					ClosingStock = ((Number) objects[18]).longValue();
 				}
 				
 
@@ -421,31 +421,31 @@ public class CRMReportServiceImpl implements CRMReportService {
 					openingStock = ((Number) objects[10]).longValue();
 				}
 				Long adjustedQuantity_FromDate = 0L;
-				if (objects[11] != null) {
-					adjustedQuantity_FromDate = ((Number) objects[11]).longValue();
+				if (objects[15] != null) {
+					adjustedQuantity_FromDate = ((Number) objects[15]).longValue();
 				}
 				Long quantityDispanced = 0L;
-				if (objects[12] != null) {
-					quantityDispanced = ((Number) objects[12]).longValue();
+				if (objects[11] != null) {
+					quantityDispanced = ((Number) objects[11]).longValue();
 				}
-				String itemName = (String) objects[13];
-				String facilityName = (String) objects[14];
-				String itemCategoryName = (String) objects[15];
+				String itemName = (String) objects[12];
+				String facilityName = (String) objects[13];
+				String itemCategoryName = (String) objects[14];
 				Long adjustedQuantity_ToDate = 0L;
-				if (objects[16] != null) {
-					adjustedQuantity_ToDate = ((Number) objects[16]).longValue();
+				if (objects[15] != null) {
+					adjustedQuantity_ToDate = ((Number) objects[15]).longValue();
 				}
 				Long adjustedQuantity_ToDate_Receipt = 0L;
-				if (objects[17] != null) {
-					adjustedQuantity_ToDate_Receipt = ((Number) objects[17]).longValue();
+				if (objects[16] != null) {
+					adjustedQuantity_ToDate_Receipt = ((Number) objects[16]).longValue();
 				}
 				Long adjustedQuantity_ToDate_Issue = 0L;
-				if (objects[18] != null) {
-					adjustedQuantity_ToDate_Issue = ((Number) objects[18]).longValue();
+				if (objects[17] != null) {
+					adjustedQuantity_ToDate_Issue = ((Number) objects[17]).longValue();
 				}
 				Long ClosingStock = 0L;
-				if (objects[19] != null) {
-					ClosingStock = ((Number) objects[19]).longValue();
+				if (objects[18] != null) {
+					ClosingStock = ((Number) objects[18]).longValue();
 				}
 //				Long actualOpening = openingStock + adjustedQuantity_FromDate;
 				Long actualOpening = openingStock;
