@@ -353,8 +353,7 @@ public class HealthService {
                 return cachedAdvancedCheckResult.isDegraded;
             }
             
-            // Execute advanced checks with strict timeout
-            AdvancedCheckResult result = executeAdvancedChecksWithTimeout(connection);
+            AdvancedCheckResult result = performAdvancedMySQLChecks(connection);
             
             // Cache the result
             lastAdvancedCheckTime = currentTime;
@@ -363,26 +362,6 @@ public class HealthService {
             return result.isDegraded;
         } finally {
             advancedCheckLock.writeLock().unlock();
-        }
-    }
-
-    private AdvancedCheckResult executeAdvancedChecksWithTimeout(Connection connection) {
-        CompletableFuture<AdvancedCheckResult> checksFuture = CompletableFuture.supplyAsync(
-            () -> performAdvancedMySQLChecks(connection), executorService);
-        
-        try {
-            return checksFuture.get(ADVANCED_CHECKS_TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS);
-        } catch (java.util.concurrent.TimeoutException e) {
-            checksFuture.cancel(true);
-            logger.warn("Advanced MySQL diagnostics timed out ({}ms)", ADVANCED_CHECKS_TIMEOUT_MS);
-            return new AdvancedCheckResult(true); // Mark as degraded on timeout
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.warn("Advanced MySQL diagnostics interrupted");
-            return new AdvancedCheckResult(true);
-        } catch (Exception e) {
-            logger.warn("Advanced MySQL diagnostics execution failed");
-            return new AdvancedCheckResult(true);
         }
     }
 
