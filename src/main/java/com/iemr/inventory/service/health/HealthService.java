@@ -87,6 +87,7 @@ public class HealthService {
     private static final String DIAGNOSTIC_DEADLOCK = "MYSQL_DEADLOCK";
     private static final String DIAGNOSTIC_SLOW_QUERIES = "MYSQL_SLOW_QUERIES";
     private static final String DIAGNOSTIC_POOL_EXHAUSTED = "MYSQL_POOL_EXHAUSTED";
+    private static final String DIAGNOSTIC_LOG_TEMPLATE = "Diagnostic: {}";
 
     private final DataSource dataSource;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -96,6 +97,9 @@ public class HealthService {
     private volatile long lastAdvancedCheckTime = 0;
     private volatile AdvancedCheckResult cachedAdvancedCheckResult = null;
     private final ReentrantReadWriteLock advancedCheckLock = new ReentrantReadWriteLock();
+    
+    // Deadlock check resilience - disable after first permission error
+    private volatile boolean deadlockCheckDisabled = false;
     
     @Value("${health.advanced.enabled:true}")
     private boolean advancedHealthChecksEnabled;
@@ -222,46 +226,6 @@ public class HealthService {
         }
     }
 
-    private HealthCheckResult checkMySQLHealth() {
-        CompletableFuture<HealthCheckResult> future = CompletableFuture.supplyAsync(
-            this::checkMySQLHealthSync, executorService);
-        
-        try {
-            return future.get(MYSQL_TIMEOUT_SECONDS + 1, TimeUnit.SECONDS);
-        } catch (TimeoutException e) {
-            future.cancel(true);
-            logger.warn("MySQL health check timed out after {} seconds", MYSQL_TIMEOUT_SECONDS);
-            return new HealthCheckResult(false, "MySQL health check timed out", false);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.warn("MySQL health check was interrupted");
-            return new HealthCheckResult(false, "MySQL health check was interrupted", false);
-        } catch (Exception e) {
-            logger.warn("MySQL health check failed: {}", e.getMessage(), e);
-            return new HealthCheckResult(false, "MySQL connection failed", false);
-        }
-    }
-
-    private HealthCheckResult checkRedisHealth() {
-        CompletableFuture<HealthCheckResult> future = CompletableFuture.supplyAsync(
-            this::checkRedisHealthSync, executorService);
-        
-        try {
-            return future.get(REDIS_TIMEOUT_SECONDS + 1, TimeUnit.SECONDS);
-        } catch (TimeoutException e) {
-            future.cancel(true);
-            logger.warn("Redis health check timed out after {} seconds", REDIS_TIMEOUT_SECONDS);
-            return new HealthCheckResult(false, "Redis health check timed out", false);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.warn("Redis health check was interrupted");
-            return new HealthCheckResult(false, "Redis health check was interrupted", false);
-        } catch (Exception e) {
-            logger.warn("Redis health check failed: {}", e.getMessage(), e);
-            return new HealthCheckResult(false, "Redis connection failed", false);
-        }
-    }
-
     private Map<String, Object> performHealthCheck(String componentName,
                                                     Map<String, Object> status,
                                                     Supplier<HealthCheckResult> checker) {
@@ -271,8 +235,16 @@ public class HealthService {
             HealthCheckResult result = checker.get();
             long responseTime = System.currentTimeMillis() - startTime;
             
-            // Set status
-            status.put(STATUS_KEY, result.isHealthy ? STATUS_UP : STATUS_DOWN);
+            // Determine status: DOWN (unhealthy), DEGRADED (healthy but with issues), or UP
+            String componentStatus;
+            if (!result.isHealthy) {
+                componentStatus = STATUS_DOWN;
+            } else if (result.isDegraded) {
+                componentStatus = STATUS_DEGRADED;
+            } else {
+                componentStatus = STATUS_UP;
+            }
+            status.put(STATUS_KEY, componentStatus);
             
             // Set response time
             status.put(RESPONSE_TIME_KEY, responseTime);
@@ -322,7 +294,7 @@ public class HealthService {
 
     private String computeOverallStatus(Map<String, Map<String, Object>> components) {
         boolean hasCritical = false;
-        boolean hasWarning = false;
+        boolean hasDegraded = false;
         
         for (Map<String, Object> componentStatus : components.values()) {
             String status = (String) componentStatus.get(STATUS_KEY);
@@ -332,8 +304,12 @@ public class HealthService {
                 hasCritical = true;
             }
             
+            if (STATUS_DEGRADED.equals(status)) {
+                hasDegraded = true;
+            }
+            
             if (SEVERITY_WARNING.equals(severity)) {
-                hasWarning = true;
+                hasDegraded = true;
             }
         }
         
@@ -341,7 +317,7 @@ public class HealthService {
             return STATUS_DOWN;
         }
         
-        if (hasWarning) {
+        if (hasDegraded) {
             return STATUS_DEGRADED;
         }
         
@@ -415,22 +391,22 @@ public class HealthService {
             boolean hasIssues = false;
             
             if (hasLockWaits(connection)) {
-                logger.warn("Diagnostic: {}", DIAGNOSTIC_LOCK_WAIT);
+                logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_LOCK_WAIT);
                 hasIssues = true;
             }
             
             if (hasDeadlocks(connection)) {
-                logger.warn("Diagnostic: {}", DIAGNOSTIC_DEADLOCK);
+                logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_DEADLOCK);
                 hasIssues = true;
             }
             
             if (hasSlowQueries(connection)) {
-                logger.warn("Diagnostic: {}", DIAGNOSTIC_SLOW_QUERIES);
+                logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_SLOW_QUERIES);
                 hasIssues = true;
             }
             
             if (hasConnectionPoolExhaustion()) {
-                logger.warn("Diagnostic: {}", DIAGNOSTIC_POOL_EXHAUSTED);
+                logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_POOL_EXHAUSTED);
                 hasIssues = true;
             }
             
@@ -444,7 +420,9 @@ public class HealthService {
     private boolean hasLockWaits(Connection connection) {
         try (PreparedStatement stmt = connection.prepareStatement(
                 "SELECT COUNT(*) FROM INFORMATION_SCHEMA.PROCESSLIST " +
-                "WHERE state LIKE '%Lock%' " +
+                "WHERE (state = 'Waiting for table metadata lock' " +
+                "   OR state = 'Waiting for row lock' " +
+                "   OR state = 'Waiting for lock') " +
                 "AND user NOT IN ('event_scheduler', 'system user', 'root')")) {
             stmt.setQueryTimeout(2);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -460,6 +438,11 @@ public class HealthService {
     }
 
     private boolean hasDeadlocks(Connection connection) {
+        // Skip deadlock check if already disabled due to permissions
+        if (deadlockCheckDisabled) {
+            return false;
+        }
+        
         try (PreparedStatement stmt = connection.prepareStatement("SHOW ENGINE INNODB STATUS")) {
             stmt.setQueryTimeout(2);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -467,6 +450,17 @@ public class HealthService {
                     String innodbStatus = rs.getString(3);
                     return innodbStatus != null && innodbStatus.contains("LATEST DETECTED DEADLOCK");
                 }
+            }
+        } catch (java.sql.SQLException e) {
+            // Check if this is a permission error
+            if (e.getMessage() != null && 
+                (e.getMessage().contains("Access denied") || 
+                 e.getMessage().contains("permission"))) {
+                // Disable this check permanently after first permission error
+                deadlockCheckDisabled = true;
+                logger.warn("Deadlock check disabled: Insufficient privileges");
+            } else {
+                logger.debug("Could not check for deadlocks");
             }
         } catch (Exception e) {
             logger.debug("Could not check for deadlocks");
@@ -494,9 +488,8 @@ public class HealthService {
 
     private boolean hasConnectionPoolExhaustion() {
         // Use HikariCP metrics if available
-        if (dataSource instanceof HikariDataSource) {
+        if (dataSource instanceof HikariDataSource hikariDataSource) {
             try {
-                HikariDataSource hikariDataSource = (HikariDataSource) dataSource;
                 HikariPoolMXBean poolMXBean = hikariDataSource.getHikariPoolMXBean();
                 
                 if (poolMXBean != null) {
@@ -513,22 +506,18 @@ public class HealthService {
         }
         
         // Fallback: try to get pool metrics via JMX if HikariCP is not directly available
+        return checkPoolMetricsViaJMX();
+    }
+
+    private boolean checkPoolMetricsViaJMX() {
         try {
             MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
             ObjectName objectName = new ObjectName("com.zaxxer.hikari:type=Pool (*)");
             var mBeans = mBeanServer.queryMBeans(objectName, null);
             
             for (var mBean : mBeans) {
-                try {
-                    Integer activeConnections = (Integer) mBeanServer.getAttribute(mBean.getObjectName(), "ActiveConnections");
-                    Integer maximumPoolSize = (Integer) mBeanServer.getAttribute(mBean.getObjectName(), "MaximumPoolSize");
-                    
-                    if (activeConnections != null && maximumPoolSize != null) {
-                        int threshold = (int) (maximumPoolSize * 0.8);
-                        return activeConnections > threshold;
-                    }
-                } catch (Exception e) {
-                    // Continue to next MBean
+                if (evaluatePoolMetrics(mBeanServer, mBean.getObjectName())) {
+                    return true;
                 }
             }
         } catch (Exception e) {
@@ -537,6 +526,21 @@ public class HealthService {
         
         // No pool metrics available - disable this check
         logger.debug("Pool exhaustion check disabled: HikariCP metrics unavailable");
+        return false;
+    }
+
+    private boolean evaluatePoolMetrics(MBeanServer mBeanServer, ObjectName objectName) {
+        try {
+            Integer activeConnections = (Integer) mBeanServer.getAttribute(objectName, "ActiveConnections");
+            Integer maximumPoolSize = (Integer) mBeanServer.getAttribute(objectName, "MaximumPoolSize");
+            
+            if (activeConnections != null && maximumPoolSize != null) {
+                int threshold = (int) (maximumPoolSize * 0.8);
+                return activeConnections > threshold;
+            }
+        } catch (Exception e) {
+            // Continue to next MBean
+        }
         return false;
     }
 
