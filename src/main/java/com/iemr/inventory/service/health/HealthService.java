@@ -28,9 +28,10 @@ import java.sql.ResultSet;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
@@ -132,20 +133,26 @@ public class HealthService {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("timestamp", Instant.now().toString());
         
-        Map<String, Object> mysqlStatus = new LinkedHashMap<>();
-        Map<String, Object> redisStatus = new LinkedHashMap<>();
+        Map<String, Object> mysqlStatus = new ConcurrentHashMap<>();
+        Map<String, Object> redisStatus = new ConcurrentHashMap<>();
         
-        // Submit both checks concurrently
-        CompletableFuture<Void> mysqlFuture = CompletableFuture.runAsync(
-            () -> performHealthCheck("MySQL", mysqlStatus, this::checkMySQLHealthSync), executorService);
-        CompletableFuture<Void> redisFuture = CompletableFuture.runAsync(
-            () -> performHealthCheck("Redis", redisStatus, this::checkRedisHealthSync), executorService);
+        // Submit both checks concurrently using executorService for proper cancellation support
+        Future<?> mysqlFuture = executorService.submit(
+            () -> performHealthCheck("MySQL", mysqlStatus, this::checkMySQLHealthSync));
+        Future<?> redisFuture = executorService.submit(
+            () -> performHealthCheck("Redis", redisStatus, this::checkRedisHealthSync));
         
-        // Wait for both checks to complete with combined timeout
+        // Wait for both checks to complete with combined timeout (shared deadline)
         long maxTimeout = Math.max(MYSQL_TIMEOUT_SECONDS, REDIS_TIMEOUT_SECONDS) + 1;
+        long deadlineNs = System.nanoTime() + TimeUnit.SECONDS.toNanos(maxTimeout);
         try {
-            CompletableFuture.allOf(mysqlFuture, redisFuture)
-                .get(maxTimeout, TimeUnit.SECONDS);
+            mysqlFuture.get(maxTimeout, TimeUnit.SECONDS);
+            long remainingNs = deadlineNs - System.nanoTime();
+            if (remainingNs > 0) {
+                redisFuture.get(remainingNs, TimeUnit.NANOSECONDS);
+            } else {
+                redisFuture.cancel(true);
+            }
         } catch (TimeoutException e) {
             logger.warn("Health check aggregate timeout after {} seconds", maxTimeout);
             mysqlFuture.cancel(true);
@@ -402,7 +409,7 @@ public class HealthService {
                 "WHERE (state = 'Waiting for table metadata lock' " +
                 "   OR state = 'Waiting for row lock' " +
                 "   OR state = 'Waiting for lock') " +
-                "AND user NOT IN ('event_scheduler', 'system user', 'root')")) {
+                "AND user = USER()")) {
             stmt.setQueryTimeout(2);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
