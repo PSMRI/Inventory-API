@@ -17,7 +17,7 @@ For detailed steps, refer to the [Developer Guide](https://piramal-swasthya.gitb
 * Wildfly 11
 * MySQL
 * Springboot V2
-* Node Js
+* Node.js
 
 ## Installation
 To install the inventory module, follow these steps:
