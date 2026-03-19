@@ -53,6 +53,7 @@ public interface InventoryReportMapper {
 	@Mappings({ @Mapping(target = "facilityName", expression = "java(entryReport.getFacilityName())"),
 		@Mapping(target = "itemName", expression = "java(entryReport.getItemName())"),
 		@Mapping(target = "itemCategory", expression = "java(entryReport.getItemCategoryName())"),
+		@Mapping(target = "strength", expression = "java(entryReport.getStrength())"),
 		@Mapping(target = "batchNo", expression = "java(entryReport.getBatchNo())"),
 		@Mapping(target = "unitCostPrice", expression = "java(entryReport.getUnitCostPrice())"),
 		@Mapping(target = "expiryDate", expression = "java(entryReport.getExpiryDate())"),

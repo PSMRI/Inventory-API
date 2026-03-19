@@ -211,7 +211,7 @@ public class CRMReportController {
 			ItemStockEntryReport report = InputMapper.gson().fromJson(request, ItemStockEntryReport.class);
 			String res = crmReportService.getShortExpiryReport(report);
 			response.setResponse(res);
-			logger.info("getShortExpiryReport response " + response.toString());
+			logger.info("Short Expiry Report response:" + response.toString());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			response.setError(e);

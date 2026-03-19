@@ -40,6 +40,8 @@ public class ExpiryReport {
 
 	private String itemCategory;
 
+	private String strength;
+
 	private String batchNo;
 
 	private Double unitCostPrice;
@@ -52,12 +54,13 @@ public class ExpiryReport {
 
 	}
 
-	public ExpiryReport(String facilityName, String itemName, String itemCategory, String batchNo, Double unitCostPrice,
+	public ExpiryReport(String facilityName, String itemName, String itemCategory, String Strength, String batchNo, Double unitCostPrice,
 			Date expiryDate, Integer quantityInHand) {
 
 		this.facilityName = facilityName;
 		this.itemName = itemName;
 		this.itemCategory = itemCategory;
+		this.strength = Strength;
 		this.batchNo = batchNo;
 		this.unitCostPrice = unitCostPrice;
 		this.expiryDate = expiryDate;
