@@ -113,5 +113,7 @@ public interface ItemStockEntryRepo extends CrudRepository<ItemStockEntry, Integ
 	@Query("update ItemStockEntry p set p.vanSerialNo=p.itemStockEntryID where p.vanSerialNo is null and p.itemStockEntryID>0")
 	Integer updateItemStockEntryVanSerialNo();
 
+	boolean existsByFacilityIDAndItemIDAndBatchNoAndExpiryDateAndEntryTypeAndDeletedFalse(
+			Integer facilityID, Integer itemID, String batchNo, Date expiryDate, String entryType);
 
 }

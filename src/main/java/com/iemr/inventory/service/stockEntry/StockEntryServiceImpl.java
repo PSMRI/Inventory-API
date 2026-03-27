@@ -90,6 +90,21 @@ public class StockEntryServiceImpl implements StockEntryService {
 			stock.setSyncFacilityID(physicalStockEntry.getFacilityID());
 		});
 
+		// Duplicate check: reject if an identical stock line already exists
+		for (ItemStockEntry stock : physicalStockEntry.getItemStockEntry()) {
+			Integer facilityID = stock.getFacilityID() != null
+					? stock.getFacilityID()
+					: physicalStockEntry.getFacilityID();
+			if (itemStockEntryRepo.existsByFacilityIDAndItemIDAndBatchNoAndExpiryDateAndEntryTypeAndDeletedFalse(
+					facilityID, stock.getItemID(), stock.getBatchNo(),
+					stock.getExpiryDate(), "physicalStockEntry")) {
+				throw new InventoryException(
+						"Duplicate stock entry: Item ID " + stock.getItemID()
+								+ " with batch '" + stock.getBatchNo()
+								+ "' already exists for this facility.");
+			}
+		}
+
 		itemStockEntryRepo.saveAll(physicalStockEntry.getItemStockEntry());
 
 		physicalStockEntryRepo.updatePhysicalStockEntryVanSerialNo();
