@@ -22,6 +22,8 @@
 package com.iemr.inventory.service.stockEntry;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -162,24 +164,29 @@ public class StockEntryServiceImpl implements StockEntryService {
 			List<ItemStockEntry> stockList = new ArrayList<ItemStockEntry>();
 			String method = item.getItemCategory().getIssueType();
 			Integer itemID = itemStockExit.getItemID();
-			Date nowdate = new Date();
 
+			// Use java.time to compute the expiry threshold.
+			// The deprecated Date.setDate/setMonth do not handle month-boundary overflow
+			// (e.g. Jan 31 + 1 month wraps to Mar 3) and ignore DST, producing an
+			// incorrect cutoff that can serve expired stock or reject valid batches.
+			LocalDate nowLocal = LocalDate.now();
 			if (itemStockExit.getDuration() != null && itemStockExit.getDuration() > 0
 					&& itemStockExit.getDurationUnit() != null) {
 				switch (itemStockExit.getDurationUnit()) {
 				case "Day(s)":
-					nowdate.setDate(nowdate.getDate() + itemStockExit.getDuration());
+					nowLocal = nowLocal.plusDays(itemStockExit.getDuration());
 					break;
 				case "Month(s)":
-					nowdate.setMonth(nowdate.getMonth() + itemStockExit.getDuration());
+					nowLocal = nowLocal.plusMonths(itemStockExit.getDuration());
 					break;
 				case "Week(s)":
-					nowdate.setDate(nowdate.getDate() + (7 * itemStockExit.getDuration()));
+					nowLocal = nowLocal.plusWeeks(itemStockExit.getDuration());
 					break;
 				default:
 					break;
 				}
 			}
+			Date nowdate = Date.from(nowLocal.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
 			if (method == null) {
 				stockList = getItemStockForStoreIDOrderByEntryDateAsc(facilityID, itemID, nowdate);
