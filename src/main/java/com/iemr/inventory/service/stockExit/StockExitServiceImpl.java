@@ -113,23 +113,36 @@ public class StockExitServiceImpl implements StockExitService {
 					+ itemissueListUpdated.size());
 			logger.info("itemissueList " + itemissueList.toString());
 			logger.info("itemissueListUpdated " + itemissueListUpdated.toString());
-			if (itemissueList.size() == itemissueListUpdated.size()) {
-				patientIssue.setSyncFacilityID(patientIssue.getFacilityID());
-				patientIssueRepo.save(patientIssue);
-				patientIssueRepo.updateVanSerialNo();
+			if (itemissueList.size() != itemissueListUpdated.size()) {
+				// Identify which items failed validation (insufficient stock) so the caller
+				// gets actionable feedback instead of a silent 0 return.
+				List<Integer> validatedItemIDs = itemissueListUpdated.stream()
+						.map(ItemStockExit::getItemID)
+						.collect(Collectors.toList());
+				List<String> failedItems = itemissueList.stream()
+						.filter(item -> !validatedItemIDs.contains(item.getItemID()))
+						.map(item -> "ItemID " + item.getItemID()
+								+ " (requested: " + item.getQuantity()
+								+ ", available: " + item.getQuantityInHand() + ")")
+						.collect(Collectors.toList());
+				throw new InventoryException(
+						"Insufficient stock for the following item(s): " + String.join(", ", failedItems));
+			}
+			patientIssue.setSyncFacilityID(patientIssue.getFacilityID());
+			patientIssueRepo.save(patientIssue);
+			patientIssueRepo.updateVanSerialNo();
 
-				returnvalue = saveItemExit(itemissueListUpdated, patientIssue.getPatientIssueID(), "T_PatientIssue");
-				if (returnvalue == 1) {
-					if (patientIssue != null && patientIssue.getBenRegID() != null
-							&& patientIssue.getVisitCode() != null) {
-						int i = updateBenFlowAfterPharmaTransaction(patientIssue);
-						if (i > 0)
-							returnvalue = 1;
-						else
-							returnvalue = 0;
-					} else {
+			returnvalue = saveItemExit(itemissueListUpdated, patientIssue.getPatientIssueID(), "T_PatientIssue");
+			if (returnvalue == 1) {
+				if (patientIssue != null && patientIssue.getBenRegID() != null
+						&& patientIssue.getVisitCode() != null) {
+					int i = updateBenFlowAfterPharmaTransaction(patientIssue);
+					if (i > 0)
+						returnvalue = 1;
+					else
 						returnvalue = 0;
-					}
+				} else {
+					returnvalue = 0;
 				}
 			}
 
@@ -194,31 +207,39 @@ public class StockExitServiceImpl implements StockExitService {
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	@Override
-	public Integer storeSelfConsumption(StoreSelfConsumption storeSelfConsumption) {
+	public Integer storeSelfConsumption(StoreSelfConsumption storeSelfConsumption) throws InventoryException {
 		Integer returnvalue = 0;
-		if (true) {
-			List<ItemStockExit> itemissueList = storeSelfConsumption.getItemStockExit();
+		List<ItemStockExit> itemissueList = storeSelfConsumption.getItemStockExit();
 
-			List<ItemStockExit> itemissueListUpdated = getItemStockAndValidate(itemissueList,
-					storeSelfConsumption.getFacilityID(), storeSelfConsumption.getCreatedBy(),
-					storeSelfConsumption.getVanID(), storeSelfConsumption.getParkingPlaceID());
-			if (itemissueList.size() == itemissueListUpdated.size()) {
-				storeSelfConsumption.setSyncFacilityID(storeSelfConsumption.getFacilityID());
-				storeSelfConsumptionRepo.save(storeSelfConsumption);
-				storeSelfConsumptionRepo.updateVanSerialNo();
-
-				returnvalue = saveItemExit(itemissueListUpdated, storeSelfConsumption.getConsumptionID(),
-						"StoreSelfConsumption");
-			}
-
+		List<ItemStockExit> itemissueListUpdated = getItemStockAndValidate(itemissueList,
+				storeSelfConsumption.getFacilityID(), storeSelfConsumption.getCreatedBy(),
+				storeSelfConsumption.getVanID(), storeSelfConsumption.getParkingPlaceID());
+		if (itemissueList.size() != itemissueListUpdated.size()) {
+			List<Integer> validatedItemIDs = itemissueListUpdated.stream()
+					.map(ItemStockExit::getItemID)
+					.collect(Collectors.toList());
+			List<String> failedItems = itemissueList.stream()
+					.filter(item -> !validatedItemIDs.contains(item.getItemID()))
+					.map(item -> "ItemID " + item.getItemID()
+							+ " (requested: " + item.getQuantity()
+							+ ", available: " + item.getQuantityInHand() + ")")
+					.collect(Collectors.toList());
+			throw new InventoryException(
+					"Insufficient stock for the following item(s): " + String.join(", ", failedItems));
 		}
+		storeSelfConsumption.setSyncFacilityID(storeSelfConsumption.getFacilityID());
+		storeSelfConsumptionRepo.save(storeSelfConsumption);
+		storeSelfConsumptionRepo.updateVanSerialNo();
+
+		returnvalue = saveItemExit(itemissueListUpdated, storeSelfConsumption.getConsumptionID(),
+				"StoreSelfConsumption");
 
 		return returnvalue;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	@Override
-	public Integer storeTransfer(T_StockTransfer stockTransfer) {
+	public Integer storeTransfer(T_StockTransfer stockTransfer) throws InventoryException {
 		Integer returnvalue = 0;
 		Long toVanID = stockTransferRepo.findVanIDByFacID(stockTransfer.getTransferToFacilityID());
 		stockTransfer.setToVanID(toVanID);
@@ -228,18 +249,29 @@ public class StockExitServiceImpl implements StockExitService {
 				stockTransfer.getTransferFromFacilityID(), stockTransfer.getCreatedBy(), stockTransfer.getVanID(),
 				null);
 
-		if (itemissueList.size() == itemissueListUpdated.size()) {
-			stockTransfer.setSyncFacilityID(stockTransfer.getTransferFromFacilityID());
-			stockTransferRepo.save(stockTransfer);
-			stockTransferRepo.updateVanSerialNo();
-
-			saveItemExit(itemissueListUpdated, stockTransfer.getStockTransferID(), "T_StockTransfer");
-
-			stockEntryService.saveItemStockFromStockTransfer(itemissueListUpdated, stockTransfer.getStockTransferID(),
-					"T_StockTransfer", stockTransfer.getTransferFromFacilityID(),
-					stockTransfer.getTransferToFacilityID(), toVanID);
-			returnvalue = 1;
+		if (itemissueList.size() != itemissueListUpdated.size()) {
+			List<Integer> validatedItemIDs = itemissueListUpdated.stream()
+					.map(ItemStockExit::getItemID)
+					.collect(Collectors.toList());
+			List<String> failedItems = itemissueList.stream()
+					.filter(item -> !validatedItemIDs.contains(item.getItemID()))
+					.map(item -> "ItemID " + item.getItemID()
+							+ " (requested: " + item.getQuantity()
+							+ ", available: " + item.getQuantityInHand() + ")")
+					.collect(Collectors.toList());
+			throw new InventoryException(
+					"Insufficient stock for the following item(s): " + String.join(", ", failedItems));
 		}
+		stockTransfer.setSyncFacilityID(stockTransfer.getTransferFromFacilityID());
+		stockTransferRepo.save(stockTransfer);
+		stockTransferRepo.updateVanSerialNo();
+
+		saveItemExit(itemissueListUpdated, stockTransfer.getStockTransferID(), "T_StockTransfer");
+
+		stockEntryService.saveItemStockFromStockTransfer(itemissueListUpdated, stockTransfer.getStockTransferID(),
+				"T_StockTransfer", stockTransfer.getTransferFromFacilityID(),
+				stockTransfer.getTransferToFacilityID(), toVanID);
+		returnvalue = 1;
 
 		return returnvalue;
 	}
