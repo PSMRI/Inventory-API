@@ -1,5 +1,5 @@
 # AMRIT - Inventory API
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)  ![branch parameter](https://github.com/PSMRI/Inventory-API/actions/workflows/sast-and-package.yml/badge.svg)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)  [![DeepWiki](https://img.shields.io/badge/DeepWiki-PSMRI%2FInventory--API-blue)](https://deepwiki.com/PSMRI/Inventory-API)
 
 Inventory service acts as a medicine inventory management and dispensing unit that helps in distributing the medicine to the pateint as per the prescription. Exposes below set of features as REST APIs.
 
