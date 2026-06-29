@@ -40,6 +40,9 @@ import com.iemr.inventory.data.supplier.M_Supplier;
 public interface MainStoreRepo extends CrudRepository<M_Facility, Integer>{
 	
 	List<M_Facility> findByProviderServiceMapID(Integer providerServiceMapID);
+
+	@Query("SELECT f FROM M_Facility f WHERE (f.providerServiceMapID = :providerServiceMapID OR f.providerServiceMapID IS NULL) AND f.deleted = false ORDER BY f.facilityName")
+	List<M_Facility> findByProviderServiceMapIDOrNull(@Param("providerServiceMapID") Integer providerServiceMapID);
     
 	@Query(value="SELECT u FROM M_Facility u WHERE u.providerServiceMapID=:providerServiceMapID AND u.isMainFacility=:isMainFacility AND deleted=0",nativeQuery=true)
 	ArrayList<M_Facility> getAllMainFacility(@Param("providerServiceMapID")Integer providerServiceMapID,@Param("isMainFacility") Boolean isMainFacility);

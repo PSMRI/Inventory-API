@@ -55,7 +55,7 @@ public class StoreServiceImpl implements StoreService {
 
 	@Override
 	public List<M_Facility> getAllMainStore(Integer providerServiceMapID) {
-		return (List<M_Facility>) mainStoreRepo.findByProviderServiceMapID(providerServiceMapID);
+		return mainStoreRepo.findByProviderServiceMapIDOrNull(providerServiceMapID);
 	}
 
 	@Override

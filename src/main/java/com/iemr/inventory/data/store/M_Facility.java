@@ -77,6 +77,9 @@ public class M_Facility {
 	@Column(name="MainFacilityID")
 	private Integer mainFacilityID;
 	@Expose
+	@Column(name="ParentFacilityID")
+	private Integer parentFacilityID;
+	@Expose
 	@Column(name="ProviderServiceMapID")
 	private Integer providerServiceMapID;
 //	@Expose
@@ -200,6 +203,14 @@ public class M_Facility {
 
 	public void setMainFacilityID(Integer mainFacilityID) {
 		this.mainFacilityID = mainFacilityID;
+	}
+
+	public Integer getParentFacilityID() {
+		return parentFacilityID;
+	}
+
+	public void setParentFacilityID(Integer parentFacilityID) {
+		this.parentFacilityID = parentFacilityID;
 	}
 
 	public Integer getProviderServiceMapID() {
