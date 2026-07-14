@@ -45,7 +45,15 @@ public interface PatientIssueRepo extends CrudRepository<T_PatientIssue, Long> {
 			+ " WHERE beneficiary_reg_id = :benRegID AND beneficiary_visit_code = :benVisitCode ", nativeQuery = true)
 	public int updateBenStatusFlowAfterPharma(@Param("benRegID") Long benRegID,
 			@Param("benVisitCode") Long benVisitCode);
-	
+
+	// Store the responsible pharmacist's user ID against the visit when drugs are dispensed
+	@Transactional
+	@Modifying
+	@Query(value = " UPDATE t_benvisitdetail SET PharmacistID = :pharmacistID "
+			+ " WHERE BeneficiaryRegID = :benRegID AND VisitCode = :benVisitCode ", nativeQuery = true)
+	public int updatePharmacistID(@Param("pharmacistID") Long pharmacistID, @Param("benRegID") Long benRegID,
+			@Param("benVisitCode") Long benVisitCode);
+
 	@Transactional
 	@Modifying
 	@Query("update T_PatientIssue p set p.vanSerialNo=p.patientIssueID where p.vanSerialNo is null and p.patientIssueID>0")
