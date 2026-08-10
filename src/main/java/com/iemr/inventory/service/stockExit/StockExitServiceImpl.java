@@ -68,6 +68,9 @@ public class StockExitServiceImpl implements StockExitService {
 	PatientIssueRepo patientIssueRepo;
 
 	@Autowired
+	com.iemr.inventory.repo.users.UserLoginRepo userLoginRepo;
+
+	@Autowired
 	StoreSelfConsumptionRepo storeSelfConsumptionRepo;
 	@Autowired
 	StockTransferRepo stockTransferRepo;
@@ -141,7 +144,24 @@ public class StockExitServiceImpl implements StockExitService {
 	private int updateBenFlowAfterPharmaTransaction(T_PatientIssue patientIssue) throws InventoryException {
 		int i = 0;
 		i = patientIssueRepo.updateBenStatusFlowAfterPharma(patientIssue.getBenRegID(), patientIssue.getVisitCode());
+		// Store the responsible pharmacist's user ID (resolved from the createdBy
+		// username) against the visit. A null/unresolved user must never block dispensing.
+		Long pharmacistID = resolveUserId(patientIssue.getCreatedBy());
+		if (pharmacistID != null)
+			patientIssueRepo.updatePharmacistID(pharmacistID, patientIssue.getBenRegID(), patientIssue.getVisitCode());
 		return i;
+	}
+
+	/**
+	 * Resolve the numeric user ID of the responsible staff member from the username
+	 * captured in createdBy. Returns null if the username is blank or cannot be
+	 * resolved, so an unknown staff member never blocks the dispensing transaction.
+	 */
+	private Long resolveUserId(String username) {
+		if (username == null || username.trim().isEmpty())
+			return null;
+		com.iemr.inventory.data.user.M_User user = userLoginRepo.getUserByUserName(username.trim());
+		return user != null ? (long) user.getUserID() : null;
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
