@@ -213,48 +213,48 @@ public class CRMReportServiceImpl implements CRMReportService {
 		for (Object[] objects : reports) {
 			if (objects != null && objects.length > 0) {
 
-				String batchNo = (String) objects[3];
+				String batchNo = objects[3] != null ? objects[3].toString() : null;
 				Long totalQuantityReceived = 0L;
 				if (objects[4] != null) {
-					totalQuantityReceived = ((Number) objects[4]).longValue();
+					totalQuantityReceived = Long.valueOf(objects[4].toString());
 				}
 				Double unitCostPrice = 0.0;
 				if (objects[5] != null) {
-					unitCostPrice = ((Number) objects[5]).doubleValue();
+					unitCostPrice = Double.valueOf(objects[5].toString());
 				}
 				Date expiryDate = (Date) objects[6];
 				Long openingStock = 0L;
 				if (objects[10] != null) {
-					openingStock = ((Number) objects[10]).longValue();
+					openingStock = Long.valueOf(objects[10].toString());
 				}
 				Long adjustedQuantity_FromDate = 0L;
 				if (objects[15] != null) {
-					adjustedQuantity_FromDate = ((Number) objects[15]).longValue();
+					adjustedQuantity_FromDate = Long.valueOf(objects[15].toString());
 				}
 				Long quantityDispanced = 0L;
 				if (objects[11] != null) {
-					quantityDispanced = ((Number) objects[11]).longValue();
+					quantityDispanced = Long.valueOf(objects[11].toString());
 				}
-				String itemName = (String) objects[12];
-				String facilityName = (String) objects[13];
-				String itemCategoryName = (String) objects[14];
+				String itemName = objects[12] != null ? objects[12].toString() : null;
+				String facilityName = objects[13] != null ? objects[13].toString() : null;
+				String itemCategoryName = objects[14] != null ? objects[14].toString() : null;
 				Long adjustedQuantity_ToDate = 0L;
 				if (objects[15] != null) {
-					adjustedQuantity_ToDate = ((Number) objects[15]).longValue();
+					adjustedQuantity_ToDate = Long.valueOf(objects[15].toString());
 				}
 				Long adjustedQuantity_ToDate_Receipt = 0L;
 				if (objects[16] != null) {
-					adjustedQuantity_ToDate_Receipt = ((Number) objects[16]).longValue();
+					adjustedQuantity_ToDate_Receipt = Long.valueOf(objects[16].toString());
 				}
 				Long adjustedQuantity_ToDate_Issue = 0L;
 				if (objects[17] != null) {
-					adjustedQuantity_ToDate_Issue = ((Number) objects[17]).longValue();
+					adjustedQuantity_ToDate_Issue = Long.valueOf(objects[17].toString());
 				}
 				Long ClosingStock = 0L;
 				if (objects[18] != null) {
-					ClosingStock = ((Number) objects[18]).longValue();
+					ClosingStock = Long.valueOf(objects[18].toString());
 				}
-				
+
 
 //				Long actualOpening = openingStock + adjustedQuantity_FromDate;
 				Long actualOpening = openingStock;
@@ -316,39 +316,39 @@ public class CRMReportServiceImpl implements CRMReportService {
 
 				Long totalQuantityReceived = 0L;
 				if (objects[5] != null) {
-					totalQuantityReceived = ((Number) objects[5]).longValue();
+					totalQuantityReceived = Long.valueOf(objects[5].toString());
 				}
 				Long openingStock = 0L;
 				if (objects[6] != null) {
-					openingStock = ((Number) objects[6]).longValue();
+					openingStock = Long.valueOf(objects[6].toString());
 				}
 				Long adjustedQuantity_FromDate = 0L;
 				if (objects[7] != null) {
-					adjustedQuantity_FromDate = ((Number) objects[7]).longValue();
+					adjustedQuantity_FromDate = Long.valueOf(objects[7].toString());
 				}
 				Long quantityDispanced = 0L;
 				if (objects[8] != null) {
-					quantityDispanced = ((Number) objects[8]).longValue();
+					quantityDispanced = Long.valueOf(objects[8].toString());
 				}
-				String itemName = (String) objects[2];
-				String facilityName = (String) objects[3];
-				String itemCategoryName = (String) objects[4];
+				String itemName = objects[2] != null ? objects[2].toString() : null;
+				String facilityName = objects[3] != null ? objects[3].toString() : null;
+				String itemCategoryName = objects[4] != null ? objects[4].toString() : null;
 				Long adjustedQuantity_ToDate = 0L;
 				if (objects[9] != null) {
-					adjustedQuantity_ToDate = ((Number) objects[9]).longValue();
+					adjustedQuantity_ToDate = Long.valueOf(objects[9].toString());
 				}
 				Long adjustedQuantity_ToDate_Receipt = 0L;
 				if (objects[10] != null) {
-					adjustedQuantity_ToDate_Receipt = ((Number) objects[10]).longValue();
+					adjustedQuantity_ToDate_Receipt = Long.valueOf(objects[10].toString());
 				}
 				Long adjustedQuantity_ToDate_Issue = 0L;
 				if (objects[11] != null) {
-					adjustedQuantity_ToDate_Issue = ((Number) objects[11]).longValue();
+					adjustedQuantity_ToDate_Issue = Long.valueOf(objects[11].toString());
 				}
-				
+
 				Long ClosingStock = 0L;
 				if (objects[12] != null) {
-					ClosingStock = ((Number) objects[12]).longValue();
+					ClosingStock = Long.valueOf(objects[12].toString());
 				}
 //				Long actualOpening = openingStock + adjustedQuantity_FromDate;
 				Long actualOpening = openingStock;
@@ -411,46 +411,46 @@ public class CRMReportServiceImpl implements CRMReportService {
 		for (Object[] objects : reports) {
 			if (objects != null && objects.length > 0) {
 
-				String batchNo = (String) objects[3];
+				String batchNo = objects[3] != null ? objects[3].toString() : null;
 				Long totalQuantityReceived = 0L;
 				if (objects[4] != null) {
-					totalQuantityReceived = ((Number) objects[4]).longValue();
+					totalQuantityReceived = Long.valueOf(objects[4].toString());
 				}
 				Double unitCostPrice = 0.0;
 				if (objects[5] != null) {
-					unitCostPrice = ((Number) objects[5]).doubleValue();
+					unitCostPrice = Double.valueOf(objects[5].toString());
 				}
 				Date expiryDate = (Date) objects[6];
 				Long openingStock = 0L;
 				if (objects[10] != null) {
-					openingStock = ((Number) objects[10]).longValue();
+					openingStock = Long.valueOf(objects[10].toString());
 				}
 				Long adjustedQuantity_FromDate = 0L;
 				if (objects[15] != null) {
-					adjustedQuantity_FromDate = ((Number) objects[15]).longValue();
+					adjustedQuantity_FromDate = Long.valueOf(objects[15].toString());
 				}
 				Long quantityDispanced = 0L;
 				if (objects[11] != null) {
-					quantityDispanced = ((Number) objects[11]).longValue();
+					quantityDispanced = Long.valueOf(objects[11].toString());
 				}
-				String itemName = (String) objects[12];
-				String facilityName = (String) objects[13];
-				String itemCategoryName = (String) objects[14];
+				String itemName = objects[12] != null ? objects[12].toString() : null;
+				String facilityName = objects[13] != null ? objects[13].toString() : null;
+				String itemCategoryName = objects[14] != null ? objects[14].toString() : null;
 				Long adjustedQuantity_ToDate = 0L;
 				if (objects[15] != null) {
-					adjustedQuantity_ToDate = ((Number) objects[15]).longValue();
+					adjustedQuantity_ToDate = Long.valueOf(objects[15].toString());
 				}
 				Long adjustedQuantity_ToDate_Receipt = 0L;
 				if (objects[16] != null) {
-					adjustedQuantity_ToDate_Receipt = ((Number) objects[16]).longValue();
+					adjustedQuantity_ToDate_Receipt = Long.valueOf(objects[16].toString());
 				}
 				Long adjustedQuantity_ToDate_Issue = 0L;
 				if (objects[17] != null) {
-					adjustedQuantity_ToDate_Issue = ((Number) objects[17]).longValue();
+					adjustedQuantity_ToDate_Issue = Long.valueOf(objects[17].toString());
 				}
 				Long ClosingStock = 0L;
 				if (objects[18] != null) {
-					ClosingStock = ((Number) objects[18]).longValue();
+					ClosingStock = Long.valueOf(objects[18].toString());
 				}
 //				Long actualOpening = openingStock + adjustedQuantity_FromDate;
 				Long actualOpening = openingStock;
