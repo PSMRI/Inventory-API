@@ -93,7 +93,9 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
 		}
 
 		Long stockdraftid = stockdraft.getStockAdjustmentDraftID();
-		itemdraft.parallelStream().forEach(action -> {
+		// Sequential: repo lookups inside a parallel stream run on separate threads,
+		// bypassing the @Transactional context and risking inconsistent reads.
+		itemdraft.forEach(action -> {
 			if (action.getSADraftItemMapID() != null) {
 				StockAdjustmentItemDraft stockAdjustmentItemDraft = stockAdjustmentItemDraftRepo
 						.findById(action.getSADraftItemMapID()).get();
@@ -103,7 +105,6 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
 				action.setProcessed(stockAdjustmentItemDraft.getProcessed());
 			}
 			action.setStockAdjustmentDraftID(stockdraftid);
-
 		});
 		itemdraft = (List<StockAdjustmentItemDraft>) stockAdjustmentItemDraftRepo.saveAll(itemdraft);
 		stockdraft.setStockAdjustmentItemDraft(itemdraft);
@@ -150,7 +151,10 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
 
 		List<Long> comapreid = new ArrayList<>();
 		final Integer facID = stockAdjustment.getFacilityID();
-		sd.parallelStream().forEach(action -> {
+		// Sequential stream: ArrayList is not thread-safe, and mutating shared objects
+		// or calling @Modifying JPA queries from a parallel stream bypasses the
+		// @Transactional boundary, risking lost updates and corrupted stock counts.
+		sd.forEach(action -> {
 			comapreid.add(action.getItemStockEntryID());
 			action.setFacilityID(facID);
 		});
@@ -177,14 +181,16 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
 		stockAdjustmentRepo.updateVanSerialNo();
 
 		Long saID = stockAdjustment.getStockAdjustmentID();
-		sd.parallelStream().forEach(action -> {
+		// Sequential: @Modifying JPA queries must run within the active transaction.
+		// A parallel stream spawns threads that execute outside the transaction
+		// coordinator, defeating rollback guarantees and causing partial stock updates.
+		sd.forEach(action -> {
 			action.setStockAdjustmentID(saID);
 			if (action.getIsAdded()) {
 				itemStockEntryRepo.addStock(action.getItemStockEntryID(), action.getAdjustedQuantity());
 			} else {
 				itemStockEntryRepo.subtractStock(action.getItemStockEntryID(), action.getAdjustedQuantity());
 			}
-
 		});
 
 		stockAdjustmentItemRepo.saveAll(sd);

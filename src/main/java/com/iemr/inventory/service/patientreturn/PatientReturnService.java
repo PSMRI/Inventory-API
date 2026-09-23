@@ -35,7 +35,7 @@ public interface PatientReturnService {
 
 	List<ItemDetailModel> getItemDetailByBen(ItemDetailModel itemDetailModel);
 
-	String updateQuantityReturned(ItemDetailModel[] itemDetailModel);
+	String updateQuantityReturned(ItemDetailModel[] itemDetailModel) throws Exception;
 
 	List<ReturnHistoryModel> getBenReturnHistory(ItemReturnEntry itemReturnEntry);
 }

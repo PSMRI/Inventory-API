@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.iemr.inventory.data.patientreturn.ItemDetailModel;
 import com.iemr.inventory.data.patientreturn.PatientReturnModel;
@@ -104,15 +105,26 @@ public class PatientReturnServiceImpl implements PatientReturnService{
 		return list;
 	}
 	@Override
-	public String updateQuantityReturned(ItemDetailModel[] itemDetailModel)
+	@Transactional(rollbackFor = Exception.class)
+	public String updateQuantityReturned(ItemDetailModel[] itemDetailModel) throws Exception
 	{
 		logger.info("updateQuantityReturned - Start");
 		List<ItemDetailModel> list = Arrays.asList(itemDetailModel);
-		List<ItemReturnEntry> returnList=null;
-		returnList = new ArrayList<ItemReturnEntry>();
-		for(ItemDetailModel itemDetail : list)
+		List<ItemReturnEntry> returnList = new ArrayList<ItemReturnEntry>();
+		for (ItemDetailModel itemDetail : list)
 		{
-			int result = patientReturnRepo.updateQuantityReturned(itemDetail.getReturnQuantity(), itemDetail.getItemStockEntryID());
+			// Guard: returnQuantity must not exceed the originally issued quantity.
+			// Without this check a caller could inflate stock beyond what was dispensed.
+			if (itemDetail.getReturnQuantity() == null || itemDetail.getReturnQuantity() <= 0) {
+				throw new Exception("Return quantity must be greater than zero for ItemID: " + itemDetail.getItemID());
+			}
+			if (itemDetail.getIssuedQuantity() != null
+					&& itemDetail.getReturnQuantity() > itemDetail.getIssuedQuantity()) {
+				throw new Exception("Return quantity (" + itemDetail.getReturnQuantity()
+						+ ") exceeds issued quantity (" + itemDetail.getIssuedQuantity()
+						+ ") for ItemID: " + itemDetail.getItemID());
+			}
+			patientReturnRepo.updateQuantityReturned(itemDetail.getReturnQuantity(), itemDetail.getItemStockEntryID());
 			patientReturnRepo.updateIssuedQuantity(itemDetail.getReturnQuantity(), itemDetail.getItemStockExitID());
 			ItemReturnEntry itemReturnEntry = new ItemReturnEntry();
 			itemReturnEntry.setCreatedBy(itemDetail.getCreatedBy());
@@ -123,7 +135,6 @@ public class PatientReturnServiceImpl implements PatientReturnService{
 			itemReturnEntry.setProviderServiceMapID(itemDetail.getProviderServiceMapID());
 			itemReturnEntry.setVisitID(itemDetail.getVisitID());
 			itemReturnEntry.setVisitCode(itemDetail.getVisitCode());
-			
 			returnList.add(itemReturnEntry);
 		}
 		itemReturnEntryRepo.saveAll(returnList);

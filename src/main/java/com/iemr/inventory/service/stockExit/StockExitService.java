@@ -43,9 +43,9 @@ public interface StockExitService {
 	List<ItemStockExit> getItemStockAndValidate(List<ItemStockExit> itemissueList, Integer facilityID,
 			String createdBy,Long vanID,Long ppID);
 	
-	Integer storeSelfConsumption(StoreSelfConsumption storeSelfConsumption);
-	
-	Integer storeTransfer(T_StockTransfer stockTransfer);
+	Integer storeSelfConsumption(StoreSelfConsumption storeSelfConsumption) throws InventoryException;
+
+	Integer storeTransfer(T_StockTransfer stockTransfer) throws InventoryException;
 	
 //	 List<ItemStockEntry> getItemStockFromItemID(Integer facilityID,List<ItemStockExit> itemStockExit);
 	

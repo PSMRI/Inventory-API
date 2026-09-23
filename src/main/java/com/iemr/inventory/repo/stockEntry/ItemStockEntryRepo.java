@@ -54,8 +54,10 @@ public interface ItemStockEntryRepo extends CrudRepository<ItemStockEntry, Integ
 
 	@Transactional
 	@Modifying
+	// Previously matched on vanSerialNo which is a mutable sync field; using the
+	// stable primary key itemStockEntryID ensures the correct batch is always updated.
 	@Query("UPDATE ItemStockEntry c SET c.quantityInHand = c.quantityInHand - :dispQuant "
-			+ " WHERE c.vanSerialNo = :itemStockEntryId and c.facilityID = :facilityID")
+			+ " WHERE c.itemStockEntryID = :itemStockEntryId and c.facilityID = :facilityID")
 	Integer updateStock(@Param("facilityID") Integer facilityID, @Param("itemStockEntryId") Long itemStockEntryId,
 			@Param("dispQuant") Integer dispQuant);
 
