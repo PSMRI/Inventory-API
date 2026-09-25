@@ -69,7 +69,9 @@ public class CRMReportServiceImpl implements CRMReportService {
 		}
 
 		StockDetailRow detail = new StockDetailRow();
+		detail.entryType = text(row[2]);
 		detail.facilityName = text(row[3]);
+		detail.itemForm = text(row[4]);
 		detail.itemName = text(row[5]);
 		detail.strength = text(row[6]);
 		detail.uom = text(row[7]);
@@ -128,7 +130,9 @@ public class CRMReportServiceImpl implements CRMReportService {
 	}
 
 	private static class StockDetailRow {
+		private String entryType;
 		private String facilityName;
+		private String itemForm;
 		private String itemName;
 		private String strength;
 		private String uom;
@@ -301,7 +305,9 @@ public class CRMReportServiceImpl implements CRMReportService {
 				DailyStockDetails stockDetail = new DailyStockDetails();
 				stockDetail.setSlNo(slNo++);
 				stockDetail.setDate(entryReport.getStartDate());
+				stockDetail.setEntryType(detail.entryType);
 				stockDetail.setFacilityName(detail.facilityName);
+				stockDetail.setItemForm(detail.itemForm);
 				stockDetail.setItemName(detail.itemName);
 				stockDetail.setItemCategory(detail.itemCategoryName);
 				stockDetail.setStrength(detail.strength);
@@ -440,7 +446,9 @@ public class CRMReportServiceImpl implements CRMReportService {
 				stockDetail.setSlNo(slNo++);
 				stockDetail.setMonth(entryReport.getMonthName());
 				stockDetail.setYear(entryReport.getYear());
+				stockDetail.setEntryType(detail.entryType);
 				stockDetail.setFacilityName(detail.facilityName);
+				stockDetail.setItemForm(detail.itemForm);
 				stockDetail.setItemName(detail.itemName);
 				stockDetail.setItemCategory(detail.itemCategoryName);
 				stockDetail.setStrength(detail.strength);
@@ -497,7 +505,9 @@ public class CRMReportServiceImpl implements CRMReportService {
 				YearlyReport stockDetail = new YearlyReport();
 				stockDetail.setSlNo(slNo++);
 				stockDetail.setYear(entryReport.getYear());
+				stockDetail.setEntryType(detail.entryType);
 				stockDetail.setFacilityName(detail.facilityName);
+				stockDetail.setItemForm(detail.itemForm);
 				stockDetail.setItemName(detail.itemName);
 				stockDetail.setItemCategory(detail.itemCategoryName);
 				stockDetail.setStrength(detail.strength);
@@ -509,6 +519,7 @@ public class CRMReportServiceImpl implements CRMReportService {
 				stockDetail.setQuantityReceived(detail.quantityReceived);
 				stockDetail.setDispensedQuantity(detail.dispensedQuantity);
 				stockDetail.setClosingStock(detail.closingStock);
+				stockDetail.setItemEnteredDate(detail.itemEnteredDate);
 				stockDetail.setAdjustmentIssue(detail.adjustmentIssue);
 				stockDetail.setAdjustmentReceipt(detail.adjustmentReceipt);
 				list.add(stockDetail);
