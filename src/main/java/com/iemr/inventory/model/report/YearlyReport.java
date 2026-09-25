@@ -41,6 +41,10 @@ public class YearlyReport {
 
 	private String itemCategory;
 
+	private String strength;
+
+	private String uom;
+
 	private String batchNo;
 
 	private Double unitCostPrice;

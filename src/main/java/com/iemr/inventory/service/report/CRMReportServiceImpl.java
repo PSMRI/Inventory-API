@@ -23,6 +23,8 @@ package com.iemr.inventory.service.report;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -60,6 +62,88 @@ public class CRMReportServiceImpl implements CRMReportService {
 	InventoryReportMapper mapper;
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+
+	private StockDetailRow mapStockDetailRow(Object[] row) {
+		if (row == null || row.length < 19) {
+			throw new IllegalArgumentException("PR_StockDetail returned an unexpected number of columns");
+		}
+
+		StockDetailRow detail = new StockDetailRow();
+		detail.facilityName = text(row[3]);
+		detail.itemName = text(row[5]);
+		detail.strength = text(row[6]);
+		detail.uom = text(row[7]);
+		detail.itemCategoryName = text(row[8]);
+		detail.batchNo = text(row[9]);
+		detail.unitCostPrice = decimal(row[10]);
+		detail.expiryDate = sqlDate(row[11]);
+		detail.quantityReceived = wholeNumber(row[12]);
+		detail.openingStock = wholeNumber(row[13]);
+		detail.dispensedQuantity = wholeNumber(row[14]);
+		detail.adjustmentReceipt = wholeNumber(row[15]);
+		detail.adjustmentIssue = wholeNumber(row[16]);
+		detail.closingStock = wholeNumber(row[17]);
+		detail.itemEnteredDate = sqlTimestamp(row[18]);
+		return detail;
+	}
+
+	private String text(Object value) {
+		return value == null ? null : value.toString();
+	}
+
+	private Long wholeNumber(Object value) {
+		return value == null ? 0L : Long.valueOf(value.toString());
+	}
+
+	private Double decimal(Object value) {
+		return value == null ? 0.0 : Double.valueOf(value.toString());
+	}
+
+	private Date sqlDate(Object value) {
+		if (value == null) {
+			return null;
+		}
+		if (value instanceof Date) {
+			return (Date) value;
+		}
+		try {
+			return new Date(new SimpleDateFormat("dd-MM-yyyy").parse(value.toString()).getTime());
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Unable to parse PR_StockDetail date: " + value, e);
+		}
+	}
+
+	private Timestamp sqlTimestamp(Object value) {
+		if (value == null) {
+			return null;
+		}
+		if (value instanceof Timestamp) {
+			return (Timestamp) value;
+		}
+		try {
+			return new Timestamp(new SimpleDateFormat("dd-MM-yyyy").parse(value.toString()).getTime());
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Unable to parse PR_StockDetail timestamp: " + value, e);
+		}
+	}
+
+	private static class StockDetailRow {
+		private String facilityName;
+		private String itemName;
+		private String strength;
+		private String uom;
+		private String itemCategoryName;
+		private String batchNo;
+		private Double unitCostPrice;
+		private Date expiryDate;
+		private Long quantityReceived;
+		private Long openingStock;
+		private Long dispensedQuantity;
+		private Long adjustmentReceipt;
+		private Long adjustmentIssue;
+		private Long closingStock;
+		private Timestamp itemEnteredDate;
+	}
 
 	@Override
 	public String getInwardStockReport(ItemStockEntryReport entryReport) {
@@ -213,85 +297,25 @@ public class CRMReportServiceImpl implements CRMReportService {
 		for (Object[] objects : reports) {
 			if (objects != null && objects.length > 0) {
 
-				String batchNo = objects[3] != null ? objects[3].toString() : null;
-				Long totalQuantityReceived = 0L;
-				if (objects[4] != null) {
-					totalQuantityReceived = Long.valueOf(objects[4].toString());
-				}
-				Double unitCostPrice = 0.0;
-				if (objects[5] != null) {
-					unitCostPrice = Double.valueOf(objects[5].toString());
-				}
-				Date expiryDate = (Date) objects[6];
-				Long openingStock = 0L;
-				if (objects[10] != null) {
-					openingStock = Long.valueOf(objects[10].toString());
-				}
-				Long adjustedQuantity_FromDate = 0L;
-				if (objects[15] != null) {
-					adjustedQuantity_FromDate = Long.valueOf(objects[15].toString());
-				}
-				Long quantityDispanced = 0L;
-				if (objects[11] != null) {
-					quantityDispanced = Long.valueOf(objects[11].toString());
-				}
-				String itemName = objects[12] != null ? objects[12].toString() : null;
-				String facilityName = objects[13] != null ? objects[13].toString() : null;
-				String itemCategoryName = objects[14] != null ? objects[14].toString() : null;
-				Long adjustedQuantity_ToDate = 0L;
-				if (objects[15] != null) {
-					adjustedQuantity_ToDate = Long.valueOf(objects[15].toString());
-				}
-				Long adjustedQuantity_ToDate_Receipt = 0L;
-				if (objects[16] != null) {
-					adjustedQuantity_ToDate_Receipt = Long.valueOf(objects[16].toString());
-				}
-				Long adjustedQuantity_ToDate_Issue = 0L;
-				if (objects[17] != null) {
-					adjustedQuantity_ToDate_Issue = Long.valueOf(objects[17].toString());
-				}
-				Long ClosingStock = 0L;
-				if (objects[18] != null) {
-					ClosingStock = Long.valueOf(objects[18].toString());
-				}
-
-
-//				Long actualOpening = openingStock + adjustedQuantity_FromDate;
-				Long actualOpening = openingStock;
-				Long actualDispensed = quantityDispanced;// - adjustedQuantity_ToDate;
-				Long actualClosing = ClosingStock;
-//				if (actualOpening == 0 || actualOpening == null) {
-//					actualClosing = totalQuantityReceived - actualDispensed + adjustedQuantity_ToDate;
-//				}
-//
-//				else {
-//					actualClosing = actualOpening - actualDispensed + adjustedQuantity_ToDate;
-//					totalQuantityReceived = 0L;
-//				}
-
-				Timestamp itemEnteredDate = null;
-				if(objects[9]!=null) {
-					itemEnteredDate = (Timestamp) objects[9];
-
-				}
+				StockDetailRow detail = mapStockDetailRow(objects);
 				DailyStockDetails stockDetail = new DailyStockDetails();
 				stockDetail.setSlNo(slNo++);
 				stockDetail.setDate(entryReport.getStartDate());
-				stockDetail.setFacilityName(facilityName);
-				stockDetail.setItemName(itemName);
-				stockDetail.setItemCategory(itemCategoryName);
-				stockDetail.setBatchNo(batchNo);
-				stockDetail.setUnitCostPrice(unitCostPrice);
-				stockDetail.setExpiryDate(expiryDate);
-				stockDetail.setOpeningStock(actualOpening);
-				stockDetail.setQuantityReceived(totalQuantityReceived);
-				stockDetail.setDispensedQuantity(actualDispensed);
-				stockDetail.setClosingStock(actualClosing);
-
-				stockDetail.setItemEnteredDate(itemEnteredDate);
-
-				stockDetail.setAdjustmentIssue(adjustedQuantity_ToDate_Issue);
-				stockDetail.setAdjustmentReceipt(adjustedQuantity_ToDate_Receipt);
+				stockDetail.setFacilityName(detail.facilityName);
+				stockDetail.setItemName(detail.itemName);
+				stockDetail.setItemCategory(detail.itemCategoryName);
+				stockDetail.setStrength(detail.strength);
+				stockDetail.setUom(detail.uom);
+				stockDetail.setBatchNo(detail.batchNo);
+				stockDetail.setUnitCostPrice(detail.unitCostPrice);
+				stockDetail.setExpiryDate(detail.expiryDate);
+				stockDetail.setOpeningStock(detail.openingStock);
+				stockDetail.setQuantityReceived(detail.quantityReceived);
+				stockDetail.setDispensedQuantity(detail.dispensedQuantity);
+				stockDetail.setClosingStock(detail.closingStock);
+				stockDetail.setItemEnteredDate(detail.itemEnteredDate);
+				stockDetail.setAdjustmentIssue(detail.adjustmentIssue);
+				stockDetail.setAdjustmentReceipt(detail.adjustmentReceipt);
 				list.add(stockDetail);
 			}
 		}
@@ -411,83 +435,26 @@ public class CRMReportServiceImpl implements CRMReportService {
 		for (Object[] objects : reports) {
 			if (objects != null && objects.length > 0) {
 
-				String batchNo = objects[3] != null ? objects[3].toString() : null;
-				Long totalQuantityReceived = 0L;
-				if (objects[4] != null) {
-					totalQuantityReceived = Long.valueOf(objects[4].toString());
-				}
-				Double unitCostPrice = 0.0;
-				if (objects[5] != null) {
-					unitCostPrice = Double.valueOf(objects[5].toString());
-				}
-				Date expiryDate = (Date) objects[6];
-				Long openingStock = 0L;
-				if (objects[10] != null) {
-					openingStock = Long.valueOf(objects[10].toString());
-				}
-				Long adjustedQuantity_FromDate = 0L;
-				if (objects[15] != null) {
-					adjustedQuantity_FromDate = Long.valueOf(objects[15].toString());
-				}
-				Long quantityDispanced = 0L;
-				if (objects[11] != null) {
-					quantityDispanced = Long.valueOf(objects[11].toString());
-				}
-				String itemName = objects[12] != null ? objects[12].toString() : null;
-				String facilityName = objects[13] != null ? objects[13].toString() : null;
-				String itemCategoryName = objects[14] != null ? objects[14].toString() : null;
-				Long adjustedQuantity_ToDate = 0L;
-				if (objects[15] != null) {
-					adjustedQuantity_ToDate = Long.valueOf(objects[15].toString());
-				}
-				Long adjustedQuantity_ToDate_Receipt = 0L;
-				if (objects[16] != null) {
-					adjustedQuantity_ToDate_Receipt = Long.valueOf(objects[16].toString());
-				}
-				Long adjustedQuantity_ToDate_Issue = 0L;
-				if (objects[17] != null) {
-					adjustedQuantity_ToDate_Issue = Long.valueOf(objects[17].toString());
-				}
-				Long ClosingStock = 0L;
-				if (objects[18] != null) {
-					ClosingStock = Long.valueOf(objects[18].toString());
-				}
-//				Long actualOpening = openingStock + adjustedQuantity_FromDate;
-				Long actualOpening = openingStock;
-				Long actualDispensed = quantityDispanced;// - adjustedQuantity_ToDate;
-				Long actualClosing = ClosingStock;
-//				Long actualClosing = 0L;
-//				if (actualOpening == 0 || actualOpening == null) {
-//					actualClosing = totalQuantityReceived - actualDispensed + adjustedQuantity_ToDate;
-//				} else {
-//					actualClosing = actualOpening - actualDispensed + adjustedQuantity_ToDate;
-//					totalQuantityReceived = 0L;
-//				}
-
-				Timestamp itemEnteredDate = null;
-				if(objects[9]!=null) {
-					itemEnteredDate = (Timestamp) objects[9];
-
-				}
+				StockDetailRow detail = mapStockDetailRow(objects);
 				MonthlyReport stockDetail = new MonthlyReport();
 				stockDetail.setSlNo(slNo++);
 				stockDetail.setMonth(entryReport.getMonthName());
 				stockDetail.setYear(entryReport.getYear());
-				stockDetail.setFacilityName(facilityName);
-				stockDetail.setItemName(itemName);
-				stockDetail.setItemCategory(itemCategoryName);
-				stockDetail.setBatchNo(batchNo);
-				stockDetail.setUnitCostPrice(unitCostPrice);
-				stockDetail.setExpiryDate(expiryDate);
-				stockDetail.setOpeningStock(actualOpening);
-				stockDetail.setQuantityReceived(totalQuantityReceived);
-				stockDetail.setDispensedQuantity(actualDispensed);
-				stockDetail.setClosingStock(actualClosing);
-
-				stockDetail.setItemEnteredDate(itemEnteredDate);
-
-				stockDetail.setAdjustmentIssue(adjustedQuantity_ToDate_Issue);
-				stockDetail.setAdjustmentReceipt(adjustedQuantity_ToDate_Receipt);
+				stockDetail.setFacilityName(detail.facilityName);
+				stockDetail.setItemName(detail.itemName);
+				stockDetail.setItemCategory(detail.itemCategoryName);
+				stockDetail.setStrength(detail.strength);
+				stockDetail.setUom(detail.uom);
+				stockDetail.setBatchNo(detail.batchNo);
+				stockDetail.setUnitCostPrice(detail.unitCostPrice);
+				stockDetail.setExpiryDate(detail.expiryDate);
+				stockDetail.setOpeningStock(detail.openingStock);
+				stockDetail.setQuantityReceived(detail.quantityReceived);
+				stockDetail.setDispensedQuantity(detail.dispensedQuantity);
+				stockDetail.setClosingStock(detail.closingStock);
+				stockDetail.setItemEnteredDate(detail.itemEnteredDate);
+				stockDetail.setAdjustmentIssue(detail.adjustmentIssue);
+				stockDetail.setAdjustmentReceipt(detail.adjustmentReceipt);
 				list.add(stockDetail);
 			}
 		}
@@ -525,66 +492,25 @@ public class CRMReportServiceImpl implements CRMReportService {
 		for (Object[] objects : reports) {
 			if (objects != null && objects.length > 0) {
 
-				String batchNo = objects[3] != null ? objects[3].toString() : null;
-				Long totalQuantityReceived = 0L;
-				if (objects[4] != null) {
-					totalQuantityReceived = Long.valueOf(objects[4].toString());
-				}
-				Double unitCostPrice = 0.0;
-				if (objects[5] != null) {
-					unitCostPrice = Double.valueOf(objects[5].toString());
-				}
-				Date expiryDate = (Date) objects[6];
-				Long openingStock = 0L;
-				if (objects[10] != null) {
-					openingStock = Long.valueOf(objects[10].toString());
-				}
-				Long adjustedQuantity_FromDate = 0L;
-				if (objects[15] != null) {
-					adjustedQuantity_FromDate = Long.valueOf(objects[15].toString());
-				}
-				Long quantityDispanced = 0L;
-				if (objects[11] != null) {
-					quantityDispanced = Long.valueOf(objects[11].toString());
-				}
-				String itemName = objects[12] != null ? objects[12].toString() : null;
-				String facilityName = objects[13] != null ? objects[13].toString() : null;
-				String itemCategoryName = objects[14] != null ? objects[14].toString() : null;
-				Long adjustedQuantity_ToDate = 0L;
-				if (objects[15] != null) {
-					adjustedQuantity_ToDate = Long.valueOf(objects[15].toString());
-				}
-				Long adjustedQuantity_ToDate_Receipt = 0L;
-				if (objects[16] != null) {
-					adjustedQuantity_ToDate_Receipt = Long.valueOf(objects[16].toString());
-				}
-				Long adjustedQuantity_ToDate_Issue = 0L;
-				if (objects[17] != null) {
-					adjustedQuantity_ToDate_Issue = Long.valueOf(objects[17].toString());
-				}
-				Long ClosingStock = 0L;
-				if (objects[18] != null) {
-					ClosingStock = Long.valueOf(objects[18].toString());
-				}
-				Long actualOpening = openingStock;
-				Long actualDispensed = quantityDispanced;
-				Long actualClosing = ClosingStock;
+				StockDetailRow detail = mapStockDetailRow(objects);
 
 				YearlyReport stockDetail = new YearlyReport();
 				stockDetail.setSlNo(slNo++);
 				stockDetail.setYear(entryReport.getYear());
-				stockDetail.setFacilityName(facilityName);
-				stockDetail.setItemName(itemName);
-				stockDetail.setItemCategory(itemCategoryName);
-				stockDetail.setBatchNo(batchNo);
-				stockDetail.setUnitCostPrice(unitCostPrice);
-				stockDetail.setExpiryDate(expiryDate);
-				stockDetail.setOpeningStock(actualOpening);
-				stockDetail.setQuantityReceived(totalQuantityReceived);
-				stockDetail.setDispensedQuantity(actualDispensed);
-				stockDetail.setClosingStock(actualClosing);
-				stockDetail.setAdjustmentIssue(adjustedQuantity_ToDate_Issue);
-				stockDetail.setAdjustmentReceipt(adjustedQuantity_ToDate_Receipt);
+				stockDetail.setFacilityName(detail.facilityName);
+				stockDetail.setItemName(detail.itemName);
+				stockDetail.setItemCategory(detail.itemCategoryName);
+				stockDetail.setStrength(detail.strength);
+				stockDetail.setUom(detail.uom);
+				stockDetail.setBatchNo(detail.batchNo);
+				stockDetail.setUnitCostPrice(detail.unitCostPrice);
+				stockDetail.setExpiryDate(detail.expiryDate);
+				stockDetail.setOpeningStock(detail.openingStock);
+				stockDetail.setQuantityReceived(detail.quantityReceived);
+				stockDetail.setDispensedQuantity(detail.dispensedQuantity);
+				stockDetail.setClosingStock(detail.closingStock);
+				stockDetail.setAdjustmentIssue(detail.adjustmentIssue);
+				stockDetail.setAdjustmentReceipt(detail.adjustmentReceipt);
 				list.add(stockDetail);
 			}
 		}
