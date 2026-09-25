@@ -36,7 +36,11 @@ public class DailyStockDetails {
 
 	private Timestamp date;
 
+	private String entryType;
+
 	private String facilityName;
+
+	private String itemForm;
 
 	private String itemName;
 

@@ -38,7 +38,11 @@ public class MonthlyReport {
 
 	private Integer year;
 
+	private String entryType;
+
 	private String facilityName;
+
+	private String itemForm;
 
 	private String itemName;
 
