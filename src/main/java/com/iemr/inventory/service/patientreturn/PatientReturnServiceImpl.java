@@ -31,6 +31,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.iemr.inventory.service.stockEntry.StockUploadMarker;
 import org.springframework.stereotype.Service;
 
 import com.iemr.inventory.data.patientreturn.ItemDetailModel;
@@ -43,6 +44,9 @@ import com.iemr.inventory.repository.patientreturn.PatientReturnRepo;
 
 @Service
 public class PatientReturnServiceImpl implements PatientReturnService{
+
+	@Autowired
+	private StockUploadMarker stockUploadMarker;
 
 	private static final Logger logger = LoggerFactory.getLogger(PatientReturnServiceImpl.class);
 	
@@ -113,6 +117,7 @@ public class PatientReturnServiceImpl implements PatientReturnService{
 		for(ItemDetailModel itemDetail : list)
 		{
 			int result = patientReturnRepo.updateQuantityReturned(itemDetail.getReturnQuantity(), itemDetail.getItemStockEntryID());
+			stockUploadMarker.batchChanged(itemDetail.getItemStockEntryID());
 			patientReturnRepo.updateIssuedQuantity(itemDetail.getReturnQuantity(), itemDetail.getItemStockExitID());
 			ItemReturnEntry itemReturnEntry = new ItemReturnEntry();
 			itemReturnEntry.setCreatedBy(itemDetail.getCreatedBy());

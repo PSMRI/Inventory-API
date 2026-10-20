@@ -56,6 +56,9 @@ import com.iemr.inventory.utils.exception.InventoryException;
 public class StockEntryServiceImpl implements StockEntryService {
 
 	@Autowired
+	private StockUploadMarker stockUploadMarker;
+
+	@Autowired
 	private PhysicalStockEntryRepo physicalStockEntryRepo;
 
 	@Autowired(required=false)
@@ -129,6 +132,8 @@ public class StockEntryServiceImpl implements StockEntryService {
 		for (ItemStockExit itemStockExit : itemissueListUpdated) {
 			cnt = cnt + itemStockEntryRepo.updateStock(itemStockExit.getFacilityID(),
 					itemStockExit.getItemStockEntryID(), itemStockExit.getQuantity());
+			stockUploadMarker.batchChangedByVanSerialNo(itemStockExit.getItemStockEntryID(),
+					itemStockExit.getFacilityID());
 		}
 
 		return cnt;
