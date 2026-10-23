@@ -29,6 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import com.iemr.inventory.service.stockEntry.StockUploadMarker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,9 @@ import com.iemr.inventory.utils.exception.InventoryException;
 
 @Service
 public class StockAdjustmentServiceImpl implements StockAdjustmentService {
+
+	@Autowired
+	private StockUploadMarker stockUploadMarker;
 
 	@Autowired(required=false)
 	StockAdjustmentDraftRepo stockAdjustmentDraftRepo;
@@ -184,6 +188,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
 			} else {
 				itemStockEntryRepo.subtractStock(action.getItemStockEntryID(), action.getAdjustedQuantity());
 			}
+			stockUploadMarker.batchChanged(action.getItemStockEntryID());
 
 		});
 

@@ -33,6 +33,8 @@ public interface CRMReportService {
 
 	String getExpiryReport(ItemStockEntryReport entryReport);
 
+	String getLowStockReport(ItemStockEntryReport entryReport) throws Exception;
+
 	String getConsumptionReport(ItemStockExitReport exitReport);
 
 	String getBenDrugIssueReport(PatientIssueExitReport exitReport);
