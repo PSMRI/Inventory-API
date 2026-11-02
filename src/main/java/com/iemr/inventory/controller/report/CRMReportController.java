@@ -86,6 +86,25 @@ public class CRMReportController {
 		return response.toString();
 	}
 
+	@ApiOperation(value = "Get low stock and out of stock report for a store", consumes = "application/json", produces = "application/json")
+	@RequestMapping(value = "/getLowStockReport", headers = "Authorization", method = {
+			RequestMethod.POST }, produces = { "application/json" })
+	public String getLowStockReport(@RequestBody String request) {
+		logger.info("getLowStockReport request " + request.toString());
+		OutputResponse response = new OutputResponse();
+		try {
+
+			ItemStockEntryReport report = InputMapper.gson().fromJson(request, ItemStockEntryReport.class);
+			String res = crmReportService.getLowStockReport(report);
+			response.setResponse(res);
+			logger.info("getLowStockReport response " + response.toString());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			response.setError(e);
+		}
+		return response.toString();
+	}
+
 	@ApiOperation(value = "Get consumption report", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = "/getConsumptionReport", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })

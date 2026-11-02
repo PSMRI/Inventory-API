@@ -57,6 +57,21 @@ public interface ItemStockReportRepo extends CrudRepository<ItemStockEntryReport
 	List<Object[]> getExpiryReportByFacilityID(@Param("startDate") Date startDate,
 			@Param("endDate") Date endDate, @Param("facilityID") Integer facilityID);
 
+	// Live stock (db_iemr, not the reporting copy): items mapped to the store whose usable (not expired) stock
+	// is 0 or at/below the item's Min_Stock.
+	@Query(value = "SELECT f.FacilityName, i.ItemID, i.ItemName, c.ItemCategoryName, i.Strength, i.Min_Stock, "
+			+ "COALESCE((SELECT SUM(e.QuantityInHand) FROM db_iemr.t_itemstockentry e WHERE e.FacilityID = f.FacilityID "
+			+ "  AND e.ItemID = i.ItemID AND e.Deleted = false AND (e.ExpiryDate IS NULL OR e.ExpiryDate >= CURDATE())), 0) AS inHand "
+			+ "FROM db_iemr.m_facility f "
+			+ "JOIN db_iemr.m_item i ON i.ItemID IN (SELECT m.ItemID FROM db_iemr.m_itemfacilitymapping m "
+			+ "  WHERE m.FacilityID = f.FacilityID AND m.Deleted = false) AND i.Deleted = false "
+			+ "  AND (i.Discontinued IS NULL OR i.Discontinued = false) "
+			+ "LEFT JOIN db_iemr.m_itemcategory c ON c.ItemCategoryID = i.ItemCategoryID "
+			+ "WHERE f.FacilityID = :facilityID "
+			+ "HAVING inHand <= 0 OR (i.Min_Stock > 0 AND inHand <= i.Min_Stock) "
+			+ "ORDER BY inHand ASC, i.ItemName ASC", nativeQuery = true)
+	List<Object[]> getLowStockReportByFacilityID(@Param("facilityID") Integer facilityID);
+
 	@Query(value="Select ISEx.*, db.BeneficiaryID, concat(IFNULL(db.Title,''),' ', IFNULL(db.FirstName,''),' ', " 
             + "IFNULL(db.MiddleName,''),' ', IFNULL(db.LastName,'')) Name from db_reporting.fact_itemstockexit ISEx left join db_iemr.t_patientissue PI "
             + "on ISEx.ExitTypeID = PI.VanSerialNo and ISEx.VanID = PI.VanID "

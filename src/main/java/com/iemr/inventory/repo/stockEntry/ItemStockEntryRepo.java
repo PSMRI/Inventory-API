@@ -96,6 +96,16 @@ public interface ItemStockEntryRepo extends CrudRepository<ItemStockEntry, Integ
 
 	@Transactional
 	@Modifying
+	@Query("UPDATE ItemStockEntry c SET c.processed = 'N' WHERE c.itemStockEntryID = :id")
+	Integer markForUpload(@Param("id") Long id);
+
+	@Transactional
+	@Modifying
+	@Query("UPDATE ItemStockEntry c SET c.processed = 'N' WHERE c.vanSerialNo = :vanSerialNo and c.facilityID = :facilityID")
+	Integer markForUploadByVanSerialNo(@Param("vanSerialNo") Long vanSerialNo, @Param("facilityID") Integer facilityID);
+
+	@Transactional
+	@Modifying
 	@Query("UPDATE ItemStockEntry c SET c.quantityInHand = c.quantityInHand - :quant WHERE c.itemStockEntryID = :id")
 	Integer subtractStock(@Param("id") Long id, @Param("quant") Integer quant);
 

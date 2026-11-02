@@ -40,6 +40,7 @@ import jakarta.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.iemr.inventory.service.stockEntry.StockUploadMarker;
 import org.springframework.stereotype.Service;
 
 import com.iemr.inventory.data.indent.Indent;
@@ -58,6 +59,9 @@ import com.iemr.inventory.repo.stockExit.ItemStockExitRepo;
 
 @Service
 public class IndentServiceImpl implements IndentService{
+
+	@Autowired
+	private StockUploadMarker stockUploadMarker;
 
 	private static final Logger logger = LoggerFactory.getLogger(IndentServiceImpl.class);
 	
@@ -237,6 +241,7 @@ public class IndentServiceImpl implements IndentService{
 			{
 				indentOrderRepo.updateQuantityInStock(indentIssue.getIssuedQty(), indentIssue.getItemStockEntryID(),
 						indentIssue.getFromFacilityID());
+				stockUploadMarker.batchChanged(indentIssue.getItemStockEntryID());
 				
 				indentIssue.setCreatedDate(new Timestamp(System.currentTimeMillis()));
 				indentIssue.setIssueDate(new Timestamp(System.currentTimeMillis()));

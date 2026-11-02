@@ -45,6 +45,7 @@ import com.iemr.inventory.model.report.DailyStockDetails;
 import com.iemr.inventory.model.report.DailyStockSummary;
 import com.iemr.inventory.model.report.ExpiryReport;
 import com.iemr.inventory.model.report.InwardStockReport;
+import com.iemr.inventory.model.report.LowStockReport;
 import com.iemr.inventory.model.report.MonthlyReport;
 import com.iemr.inventory.model.report.TransitReport;
 import com.iemr.inventory.model.report.YearlyReport;
@@ -69,7 +70,9 @@ public class CRMReportServiceImpl implements CRMReportService {
 		}
 
 		StockDetailRow detail = new StockDetailRow();
+		detail.entryType = text(row[2]);
 		detail.facilityName = text(row[3]);
+		detail.itemForm = text(row[4]);
 		detail.itemName = text(row[5]);
 		detail.strength = text(row[6]);
 		detail.uom = text(row[7]);
@@ -128,7 +131,9 @@ public class CRMReportServiceImpl implements CRMReportService {
 	}
 
 	private static class StockDetailRow {
+		private String entryType;
 		private String facilityName;
+		private String itemForm;
 		private String itemName;
 		private String strength;
 		private String uom;
@@ -191,6 +196,29 @@ public class CRMReportServiceImpl implements CRMReportService {
 						(Date) (object[6] != null ? object[6] : null),
 						(Integer) (object[7] != null ? object[7] : null));
 
+				report.setSlNo(slNo++);
+				reportList.add(report);
+			}
+		}
+
+		return reportList.toString();
+	}
+
+	@Override
+	public String getLowStockReport(ItemStockEntryReport entryReport) throws Exception {
+
+		if (entryReport == null || entryReport.getFacilityID() == null) {
+			throw new Exception("facilityID is required");
+		}
+		List<Object[]> list = itemStockReportRepo.getLowStockReportByFacilityID(entryReport.getFacilityID());
+		List<LowStockReport> reportList = new ArrayList<LowStockReport>();
+		Long slNo = 1L;
+		for (Object[] object : list) {
+			if (object != null) {
+				LowStockReport report = new LowStockReport(text(object[0]),
+						object[1] != null ? ((Number) object[1]).intValue() : null, text(object[2]), text(object[3]),
+						text(object[4]), object[5] != null ? ((Number) object[5]).intValue() : null,
+						object[6] != null ? ((Number) object[6]).intValue() : 0);
 				report.setSlNo(slNo++);
 				reportList.add(report);
 			}
@@ -301,7 +329,9 @@ public class CRMReportServiceImpl implements CRMReportService {
 				DailyStockDetails stockDetail = new DailyStockDetails();
 				stockDetail.setSlNo(slNo++);
 				stockDetail.setDate(entryReport.getStartDate());
+				stockDetail.setEntryType(detail.entryType);
 				stockDetail.setFacilityName(detail.facilityName);
+				stockDetail.setItemForm(detail.itemForm);
 				stockDetail.setItemName(detail.itemName);
 				stockDetail.setItemCategory(detail.itemCategoryName);
 				stockDetail.setStrength(detail.strength);
@@ -440,7 +470,9 @@ public class CRMReportServiceImpl implements CRMReportService {
 				stockDetail.setSlNo(slNo++);
 				stockDetail.setMonth(entryReport.getMonthName());
 				stockDetail.setYear(entryReport.getYear());
+				stockDetail.setEntryType(detail.entryType);
 				stockDetail.setFacilityName(detail.facilityName);
+				stockDetail.setItemForm(detail.itemForm);
 				stockDetail.setItemName(detail.itemName);
 				stockDetail.setItemCategory(detail.itemCategoryName);
 				stockDetail.setStrength(detail.strength);
@@ -497,7 +529,9 @@ public class CRMReportServiceImpl implements CRMReportService {
 				YearlyReport stockDetail = new YearlyReport();
 				stockDetail.setSlNo(slNo++);
 				stockDetail.setYear(entryReport.getYear());
+				stockDetail.setEntryType(detail.entryType);
 				stockDetail.setFacilityName(detail.facilityName);
+				stockDetail.setItemForm(detail.itemForm);
 				stockDetail.setItemName(detail.itemName);
 				stockDetail.setItemCategory(detail.itemCategoryName);
 				stockDetail.setStrength(detail.strength);
@@ -509,6 +543,7 @@ public class CRMReportServiceImpl implements CRMReportService {
 				stockDetail.setQuantityReceived(detail.quantityReceived);
 				stockDetail.setDispensedQuantity(detail.dispensedQuantity);
 				stockDetail.setClosingStock(detail.closingStock);
+				stockDetail.setItemEnteredDate(detail.itemEnteredDate);
 				stockDetail.setAdjustmentIssue(detail.adjustmentIssue);
 				stockDetail.setAdjustmentReceipt(detail.adjustmentReceipt);
 				list.add(stockDetail);
