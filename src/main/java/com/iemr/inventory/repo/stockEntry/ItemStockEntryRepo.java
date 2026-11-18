@@ -99,6 +99,20 @@ public interface ItemStockEntryRepo extends CrudRepository<ItemStockEntry, Integ
 	@Query("UPDATE ItemStockEntry c SET c.quantityInHand = c.quantityInHand - :quant WHERE c.itemStockEntryID = :id")
 	Integer subtractStock(@Param("id") Long id, @Param("quant") Integer quant);
 
+	// Takes the stock out only if the batch still holds enough; returns 0 otherwise,
+	// so stock in hand can never go below zero.
+	@Transactional
+	@Modifying
+	@Query("UPDATE ItemStockEntry c SET c.quantityInHand = c.quantityInHand - :quant "
+			+ "WHERE c.itemStockEntryID = :id AND c.quantityInHand >= :quant")
+	Integer subtractStockIfAvailable(@Param("id") Long id, @Param("quant") Integer quant);
+
+	// Row-locks the batches for the rest of the transaction. A second request touching
+	// the same batches waits here until the first one has committed.
+	@Query(value = "SELECT ItemStockEntryID FROM t_itemstockentry WHERE ItemStockEntryID IN (:ids) FOR UPDATE",
+			nativeQuery = true)
+	List<Object> lockForUpdate(@Param("ids") List<Long> ids);
+
 	List<ItemStockEntry> findByItemStockEntryIDIn(List<Long> comapreid);
 
 	@Query(nativeQuery = true, value = "select van.vanID from m_facility fac left join m_van  van on fac.facilityID=van.facilityID"
