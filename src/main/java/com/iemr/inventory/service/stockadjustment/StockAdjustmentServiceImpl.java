@@ -23,6 +23,8 @@ package com.iemr.inventory.service.stockadjustment;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -143,57 +145,116 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
 		return stock;
 	}
 
+	// An identical adjustment for the same facility within this many seconds is treated
+	// as a repeated submit (double click / retry) of one already saved.
+	private static final int DUPLICATE_WINDOW_SECONDS = 120;
+
+	private static final String ALREADY_SAVED = "This stock adjustment has already been saved";
+
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public StockAdjustment savetransaction(StockAdjustment stockAdjustment) throws InventoryException {
 		List<StockAdjustmentItem> sd = stockAdjustment.getStockAdjustmentItem();
+		if (sd == null || sd.isEmpty())
+			throw new InventoryException("No item found to adjust");
 		stockAdjustment.setStockAdjustmentItem(null);
 
-		List<Long> comapreid = new ArrayList<>();
 		final Integer facID = stockAdjustment.getFacilityID();
-		sd.parallelStream().forEach(action -> {
-			comapreid.add(action.getItemStockEntryID());
+		List<Long> entryIDs = new ArrayList<>();
+		for (StockAdjustmentItem action : sd) {
 			action.setFacilityID(facID);
-		});
+			action.setSyncFacilityID(facID);
+			entryIDs.add(action.getItemStockEntryID());
+		}
 
-		List<ItemStockEntry> compareobject = itemStockEntryRepo.findByItemStockEntryIDIn(comapreid);
+		// Lock the batches first, so a repeated submit of this adjustment waits until this
+		// one commits, and then sees it in the checks below.
+		itemStockEntryRepo.lockForUpdate(entryIDs);
 
-		Map<Integer, ItemStockEntry> result = compareobject.stream()
-				.collect(Collectors.toMap(ItemStockEntry::getItemStockEntryID, Function.identity()));
+		// A draft can be turned into an adjustment only once.
+		if (stockAdjustment.getStockAdjustmentDraftID() != null
+				&& stockAdjustmentDraftRepo.markCompletedIfOpen(stockAdjustment.getStockAdjustmentDraftID()) == 0)
+			throw new InventoryException(ALREADY_SAVED);
+
+		if (isRepeatOfRecentAdjustment(facID, sd))
+			throw new InventoryException(ALREADY_SAVED);
+
+		// Keyed by Long: ItemStockEntry's id is an int, and a Map<Integer, ...> looked up with
+		// the item's Long id never matched, so this check never ran before.
+		Map<Long, ItemStockEntry> batches = itemStockEntryRepo.findByItemStockEntryIDIn(entryIDs).stream()
+				.collect(Collectors.toMap(e -> (long) e.getItemStockEntryID(), Function.identity()));
 
 		for (StockAdjustmentItem action : sd) {
-			action.setSyncFacilityID(facID);
-			ItemStockEntry itemStockEntry = result.get(action.getItemStockEntryID());
-
-			if (!action.getIsAdded()) {
-				if (null != itemStockEntry && action.getAdjustedQuantity() > itemStockEntry.getQuantityInHand()) {
-					throw new InventoryException(
-							"Adjustment Quantity for issue should be more than available quantity");
-				}
-			}
+			ItemStockEntry batch = batches.get(action.getItemStockEntryID());
+			if (batch == null)
+				throw new InventoryException("Batch " + action.getItemStockEntryID() + " not found");
+			if (!Boolean.TRUE.equals(action.getIsAdded()) && batch.getQuantityInHand() != null
+					&& action.getAdjustedQuantity() > batch.getQuantityInHand())
+				throw new InventoryException("Adjustment quantity for issue cannot be more than the available quantity");
 		}
 
 		stockAdjustment.setSyncFacilityID(facID);
 		stockAdjustmentRepo.save(stockAdjustment);
 		stockAdjustmentRepo.updateVanSerialNo();
 
+		// Sequential, not parallelStream: worker threads do not join this transaction, so
+		// their stock updates were not rolled back when a later step failed.
 		Long saID = stockAdjustment.getStockAdjustmentID();
-		sd.parallelStream().forEach(action -> {
+		for (StockAdjustmentItem action : sd) {
 			action.setStockAdjustmentID(saID);
-			if (action.getIsAdded()) {
-				itemStockEntryRepo.addStock(action.getItemStockEntryID(), action.getAdjustedQuantity());
-			} else {
-				itemStockEntryRepo.subtractStock(action.getItemStockEntryID(), action.getAdjustedQuantity());
-			}
-
-		});
+			int updated = Boolean.TRUE.equals(action.getIsAdded())
+					? itemStockEntryRepo.addStock(action.getItemStockEntryID(), action.getAdjustedQuantity())
+					: itemStockEntryRepo.subtractStockIfAvailable(action.getItemStockEntryID(),
+							action.getAdjustedQuantity());
+			if (updated == 0)
+				throw new InventoryException("Adjustment quantity for issue cannot be more than the available quantity");
+		}
 
 		stockAdjustmentItemRepo.saveAll(sd);
 		stockAdjustmentItemRepo.updateVanSerialNo();
 		stockAdjustment.setStockAdjustmentItem(sd);
-		if (stockAdjustment.getStockAdjustmentDraftID() != null) {
-			stockAdjustmentDraftRepo.updatecompleted(stockAdjustment.getStockAdjustmentDraftID(), true);
-		}
 		return stockAdjustment;
+	}
+
+	/**
+	 * True when the facility already saved an adjustment with exactly these items
+	 * (batch, receipt/issue, quantity) within the last DUPLICATE_WINDOW_SECONDS.
+	 */
+	private boolean isRepeatOfRecentAdjustment(Integer facID, List<StockAdjustmentItem> items) {
+		if (facID == null)
+			return false;
+
+		List<String> incoming = new ArrayList<>();
+		for (StockAdjustmentItem item : items)
+			incoming.add(itemKey(item.getItemStockEntryID(), Boolean.TRUE.equals(item.getIsAdded()),
+					item.getAdjustedQuantity()));
+		Collections.sort(incoming);
+
+		Map<String, List<String>> recent = new HashMap<>();
+		for (Object[] row : stockAdjustmentItemRepo.findRecentAdjustmentItems(facID, DUPLICATE_WINDOW_SECONDS))
+			recent.computeIfAbsent(String.valueOf(row[0]), k -> new ArrayList<>())
+					.add(itemKey(row[1], isTrue(row[2]), row[3]));
+
+		for (List<String> saved : recent.values()) {
+			Collections.sort(saved);
+			if (saved.equals(incoming))
+				return true;
+		}
+		return false;
+	}
+
+	private static String itemKey(Object itemStockEntryID, boolean isAdded, Object quantity) {
+		return itemStockEntryID + "|" + isAdded + "|" + quantity;
+	}
+
+	// IsAdded comes back from the native query as Boolean, a number or a BIT byte array.
+	private static boolean isTrue(Object value) {
+		if (value instanceof Boolean)
+			return (Boolean) value;
+		if (value instanceof Number)
+			return ((Number) value).intValue() == 1;
+		if (value instanceof byte[])
+			return ((byte[]) value).length > 0 && ((byte[]) value)[0] == 1;
+		return value != null && ("1".equals(value.toString()) || "true".equalsIgnoreCase(value.toString()));
 	}
 
 	public StockAdjustment getforeditStockAjustmentTransaction(Long stockAdjustmentID) {

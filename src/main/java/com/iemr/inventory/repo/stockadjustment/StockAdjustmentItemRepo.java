@@ -44,4 +44,11 @@ public interface StockAdjustmentItemRepo extends CrudRepository<StockAdjustmentI
 
 	List<StockAdjustmentItem> findByStockAdjustmentIDAndSyncFacilityID(Long vanSerialNo, Integer syncFacilityID);
 
+	// Items of the facility's adjustments saved in the last :seconds seconds. A locking
+	// read, so it sees an adjustment another request committed a moment ago.
+	@Query(value = "SELECT StockAdjustmentID, ItemStockEntryID, IsAdded, AdjustedQuantity FROM t_saitemmapping "
+			+ "WHERE FacilityID = :facilityID AND IFNULL(Deleted, 0) = 0 "
+			+ "AND CreatedDate >= NOW() - INTERVAL :seconds SECOND LOCK IN SHARE MODE", nativeQuery = true)
+	List<Object[]> findRecentAdjustmentItems(@Param("facilityID") Integer facilityID, @Param("seconds") Integer seconds);
+
 }

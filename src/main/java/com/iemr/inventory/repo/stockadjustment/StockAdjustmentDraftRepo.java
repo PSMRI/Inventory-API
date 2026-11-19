@@ -57,4 +57,12 @@ public interface StockAdjustmentDraftRepo extends CrudRepository<StockAdjustment
 	@Query("UPDATE StockAdjustmentDraft c SET c.isCompleted = :isCompleted WHERE c.stockAdjustmentDraftID = :id")
 	Integer updatecompleted(@Param("id")Long stockAdjustmentDraftID,@Param("isCompleted") boolean b);
 
+	// Marks the draft completed only if it is still open; returns 0 when it was already
+	// completed, i.e. this draft has already been saved as an adjustment.
+	@Transactional
+	@Modifying
+	@Query("UPDATE StockAdjustmentDraft c SET c.isCompleted = true WHERE c.stockAdjustmentDraftID = :id "
+			+ "AND (c.isCompleted IS NULL OR c.isCompleted = false)")
+	Integer markCompletedIfOpen(@Param("id") Long stockAdjustmentDraftID);
+
 }
